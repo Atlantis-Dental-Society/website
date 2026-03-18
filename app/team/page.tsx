@@ -1,7 +1,10 @@
-import { teamMembers } from "@/lib/data";
+import { getTeamMembers } from "@/lib/tina";
 import { User } from "lucide-react";
+import { TinaMarkdown } from "tinacms/dist/rich-text";
 
-export default function TeamPage() {
+export default async function TeamPage() {
+  const teamMembers = await getTeamMembers();
+
   return (
     <section className="relative overflow-hidden py-24 sm:py-28">
       <div className="absolute -top-32 -left-32 h-96 w-96 blob-shape-2 bg-sage/8 blur-3xl" />
@@ -34,7 +37,9 @@ export default function TeamPage() {
                 <h2 className="mt-5 text-xl font-bold">{m.name}</h2>
                 <div className="mt-1 text-sm font-semibold text-primary">{m.position}</div>
                 <div className="mt-0.5 inline-flex rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{m.specialty}</div>
-                <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{m.bio}</p>
+                <div className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                  <TinaMarkdown content={m.bio} />
+                </div>
               </div>
             );
           })}

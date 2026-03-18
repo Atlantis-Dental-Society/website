@@ -1,9 +1,11 @@
-import { services } from "@/lib/data";
+import { getServices } from "@/lib/tina";
 import { BookOpen, FlaskConical, Users, BarChart3, Cpu, Calendar, Check } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = { BookOpen, FlaskConical, Users, BarChart3, Cpu, Calendar };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await getServices();
+
   return (
     <section className="relative overflow-hidden py-24 sm:py-28">
       <div className="absolute -top-32 -right-32 h-96 w-96 blob-shape-1 bg-primary/6 blur-3xl" />
@@ -22,7 +24,7 @@ export default function ServicesPage() {
 
         <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s) => {
-            const Icon = iconMap[s.icon] || BookOpen;
+            const Icon = iconMap[s.icon ?? ""] || BookOpen;
             return (
               <div key={s.title} className="group rounded-3xl bg-card p-8 shadow-warm hover:shadow-warm-lg transition-all hover:-translate-y-1">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
@@ -30,16 +32,18 @@ export default function ServicesPage() {
                 </div>
                 <h2 className="mt-5 text-xl font-bold">{s.title}</h2>
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.description}</p>
-                <ul className="mt-5 space-y-2.5">
-                  {s.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-sage/15">
-                        <Check className="h-3 w-3 text-sage" />
-                      </div>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+                {s.features && s.features.length > 0 && (
+                  <ul className="mt-5 space-y-2.5">
+                    {s.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-sage/15">
+                          <Check className="h-3 w-3 text-sage" />
+                        </div>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             );
           })}

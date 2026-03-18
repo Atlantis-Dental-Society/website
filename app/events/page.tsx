@@ -1,8 +1,10 @@
-import { events } from "@/lib/data";
+import { getEvents } from "@/lib/tina";
 import { CalendarDays, MapPin, Clock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  const events = await getEvents();
+
   return (
     <section className="relative overflow-hidden py-24 sm:py-28">
       <div className="absolute -top-32 -right-32 h-96 w-96 blob-shape-1 bg-primary/6 blur-3xl" />
@@ -59,7 +61,9 @@ export default function EventsPage() {
                 <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{e.description}</p>
                 <div className="mt-5 flex items-center gap-3">
                   <Button size="sm" className="rounded-full px-6 shadow-gold">Register</Button>
-                  <span className="rounded-full bg-muted px-4 py-1.5 text-xs font-medium text-muted-foreground">{e.category}</span>
+                  {e.category && (
+                    <span className="rounded-full bg-muted px-4 py-1.5 text-xs font-medium text-muted-foreground">{e.category}</span>
+                  )}
                 </div>
               </div>
             </div>
