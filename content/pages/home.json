@@ -1,0 +1,50 @@
+{
+  "title": "Home",
+  "description": "Atlantis Dental Society — Everything pre-dental, all in one place.",
+  "hero": {
+    "badge": "Atlantis Dental Society",
+    "headline": "Everything Pre-Dental, All in One Place",
+    "subheadline": "Helping future dental professionals navigate the path to dental school with confidence.",
+    "ctaPrimary": "Explore Events",
+    "ctaPrimaryLink": "/events",
+    "ctaSecondary": "Contact Us",
+    "ctaSecondaryLink": "/contact"
+  },
+  "sections": [
+    {
+      "id": "welcome",
+      "heading": "Welcome to ADS",
+      "body": "Atlantis Dental Society is a student-led organization dedicated to helping pre-dental students grow academically, professionally, and personally on their journey toward dentistry. We aim to make the path to dental school more accessible by connecting students to valuable resources, educational opportunities, clinical exposure, mentorship, and a strong community of support."
+    },
+    {
+      "id": "what-we-offer",
+      "heading": "What We Offer",
+      "body": "At ADS, we believe students deserve more than scattered information and isolated experiences. We provide a space where aspiring dental professionals can access meaningful support in one place. From events and mentorship to academic guidance, admissions resources, and professional networking, ADS is here to help students take informed and confident steps toward the future."
+    },
+    {
+      "id": "events-teaser",
+      "heading": "Upcoming Events",
+      "body": "Join us at upcoming ADS events designed to educate, connect, and inspire. From panels and workshops to networking opportunities and speaker sessions, our events bring students closer to the world of dentistry while helping them build confidence, knowledge, and professional connections."
+    },
+    {
+      "id": "support",
+      "heading": "Support for Your Pre-Dental Journey",
+      "body": "ADS offers students access to support systems that extend beyond the classroom. Whether you are looking for mentorship, interview preparation, academic guidance, professional insight, or opportunities to connect with others in the field, our goal is to help you navigate the dental path with greater clarity and confidence."
+    },
+    {
+      "id": "resources",
+      "heading": "Resources That Help You Prepare",
+      "body": "Explore curated tools and materials created to support your growth as a pre-dental student. From DAT resources and admissions information to checklists, guides, and shared opportunities, ADS works to make important information more accessible, organized, and useful."
+    },
+    {
+      "id": "partner",
+      "heading": "Partner With Us",
+      "body": "Atlantis Dental Society welcomes collaboration with clinics, professionals, organizations, and businesses that want to support the next generation of dental professionals. Through partnerships, sponsorships, speaking opportunities, and mentorship initiatives, we aim to create meaningful value for both students and partners."
+    },
+    {
+      "id": "join-cta",
+      "heading": "Join the ADS Community",
+      "body": "Whether you are just beginning to explore dentistry or actively preparing for dental school, Atlantis Dental Society is here to support your growth. Join a community built on opportunity, connection, and a shared commitment to the future of dentistry."
+    }
+  ]
+}

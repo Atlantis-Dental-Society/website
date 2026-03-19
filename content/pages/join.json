@@ -1,0 +1,16 @@
+{
+  "title": "Join",
+  "description": "Join Atlantis Dental Society and become part of our pre-dental community.",
+  "hero": {
+    "badge": "Join ADS",
+    "headline": "Join Atlantis Dental Society",
+    "subheadline": "If you are interested in becoming part of Atlantis Dental Society, we would love to hear from you. Our Join section is designed to help us learn more about the students who want to be involved in ADS and better understand their goals, interests, and experiences."
+  },
+  "sections": [
+    {
+      "id": "eligibility",
+      "heading": "Eligibility Note",
+      "body": "Please note that while students from different schools may be welcome to engage with Atlantis Dental Society, only York University students are eligible to hold executive positions at this time. The current questions are being used as a starting point and will need to be revised over time to better match the goals and growth of the society."
+    }
+  ]
+}

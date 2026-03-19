@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { siteConfig } from "@/lib/data";
-import { Leaf, Heart } from "lucide-react";
+import { Leaf, Heart, Mail, Instagram } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export function Footer() {
   return (
@@ -18,9 +18,9 @@ export function Footer() {
               </div>
               <span className="text-lg font-bold text-foreground">ADS</span>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{siteConfig.tagline}</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">Everything pre-dental, all in one place.</p>
             <p className="mt-2 text-xs text-muted-foreground/70">
-              A premier dental society dedicated to advancing oral healthcare through education, collaboration, and innovation.
+              A student-led organization at York University helping pre-dental students navigate their path to dental school.
             </p>
           </div>
 
@@ -47,19 +47,30 @@ export function Footer() {
           <div>
             <h4 className="font-bold text-foreground text-sm uppercase tracking-wider">Contact</h4>
             <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-              <li>{siteConfig.email}</li>
-              <li>{siteConfig.phone}</li>
-              <li className="leading-relaxed">{siteConfig.address}</li>
+              <li className="flex items-center gap-2">
+                <Mail className="h-3.5 w-3.5 text-primary" />
+                <a href="mailto:atlantisdentalsociety@gmail.com" className="hover:text-primary transition-colors">
+                  atlantisdentalsociety@gmail.com
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Instagram className="h-3.5 w-3.5 text-primary" />
+                <a href="https://instagram.com/atlantisdentalsociety" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                  @atlantisdentalsociety
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center gap-3 border-t border-border/30 pt-8">
+        <Separator className="mt-12 bg-border/30" />
+
+        <div className="flex flex-col items-center gap-3 pt-8">
           <div className="flex items-center gap-1 text-xs text-muted-foreground/60">
-            Made with <Heart className="h-3 w-3 text-terracotta fill-terracotta" /> for dental excellence
+            Made with <Heart className="h-3 w-3 text-terracotta fill-terracotta" /> for future dental professionals
           </div>
           <div className="text-center text-xs text-muted-foreground/60">
-            &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+            &copy; {new Date().getFullYear()} Atlantis Dental Society. All rights reserved.
           </div>
         </div>
       </div>

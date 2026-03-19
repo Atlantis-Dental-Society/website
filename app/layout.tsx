@@ -9,7 +9,7 @@ const nunito = Nunito({ subsets: ["latin"], variable: "--font-sans", weight: ["3
 
 export const metadata = {
   title: "Atlantis Dental Society",
-  description: "Elevating the Standard of Dental Excellence",
+  description: "Everything pre-dental, all in one place. A student-led organization at York University helping future dental professionals navigate the path to dental school.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,0 +1,16 @@
+{
+  "title": "Contact",
+  "description": "Get in touch with Atlantis Dental Society.",
+  "hero": {
+    "badge": "Get in Touch",
+    "headline": "Contact Us",
+    "subheadline": "We would love to hear from you. Whether you have a question, want to collaborate, or are interested in learning more about Atlantis Dental Society, feel free to reach out."
+  },
+  "sections": [
+    {
+      "id": "contact-info",
+      "heading": "Reach Us",
+      "body": "Email: atlantisdentalsociety@gmail.com\nInstagram: @atlantisdentalsociety"
+    }
+  ]
+}

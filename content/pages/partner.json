@@ -1,0 +1,16 @@
+{
+  "title": "Partner With Us",
+  "description": "Collaborate with Atlantis Dental Society to support future dental professionals.",
+  "hero": {
+    "badge": "Collaborate With Us",
+    "headline": "Partner With Us",
+    "subheadline": "Atlantis Dental Society welcomes collaboration with dental offices, dentists, clinics, laboratories, event planners, organizations, and other professionals who want to support the next generation of dental professionals. By working together, we can create meaningful opportunities for pre-dental students while also building stronger connections between the student community and the field of dentistry."
+  },
+  "sections": [
+    {
+      "id": "partnership-details",
+      "heading": "How We Collaborate",
+      "body": "Our partnerships are rooted in education, exposure, mentorship, and growth. Whether through events, sponsorships, networking opportunities, mentorship initiatives, or professional collaboration, ADS aims to create value for both students and partners."
+    }
+  ]
+}

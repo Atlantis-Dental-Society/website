@@ -1,0 +1,31 @@
+{
+  "title": "About",
+  "description": "Learn about Atlantis Dental Society and our mission to support pre-dental students.",
+  "hero": {
+    "badge": "About Us",
+    "headline": "About Atlantis Dental Society",
+    "subheadline": "Atlantis Dental Society is a student-led organization committed to supporting the next generation of dental professionals. We exist to help pre-dental students access the guidance, opportunities, and community they need to move forward with confidence on their path toward dentistry."
+  },
+  "sections": [
+    {
+      "id": "who-we-are",
+      "heading": "Who We Are",
+      "body": "Atlantis Dental Society was founded from a simple but important realization: many students interested in dentistry receive different advice from different people. Information often comes from family, friends, community members, dental students, and others, but it can feel scattered, inconsistent, and confusing. ADS was created to bring that information together in one place and to support students who feel uncertain about how to move forward. We are a student-led society built to make the pre-dental journey more clear, connected, and accessible for those who are serious about becoming dentists."
+    },
+    {
+      "id": "achieve",
+      "heading": "What We Are Trying to Achieve",
+      "body": "Our goal is to help anyone who truly wants to become a dentist navigate the path to dental school with greater clarity, confidence, and support. We aim to reduce confusion, expand access to reliable guidance, and create opportunities that help students grow academically, professionally, and personally. By offering resources, mentorship, exposure, and community, ADS works to make the path to dentistry more informed, more achievable, and less overwhelming."
+    },
+    {
+      "id": "active",
+      "heading": "Where We Are Active",
+      "body": "Atlantis Dental Society is active across several areas of the pre-dental journey. We support students through academic and admissions guidance, DAT-related resources, mentorship and peer advising, professional development events, networking opportunities, and increased clinical exposure. We also value community engagement, charitable initiatives, and ethical involvement within the dental profession."
+    },
+    {
+      "id": "work-with",
+      "heading": "Who We Work With",
+      "body": "Atlantis Dental Society collaborates with professionals and organizations that help broaden the pre-dental experience for students. We seek to work with dentists, clinics, dental laboratories, event planners, advisors, mentors, and related organizations that share a commitment to education, mentorship, and student growth. These connections are important because exposure to the field before dental school helps students better understand the profession, make more informed decisions, and build stronger experience for their resumes and future applications. Through these relationships, ADS aims to create meaningful opportunities for learning, networking, and professional development."
+    }
+  ]
+}
