@@ -34,7 +34,7 @@ export default async function InsightPage({ params }: { params: Promise<{ slug: 
         </Button>
 
         <div className={`aspect-[2/1] rounded-3xl bg-gradient-to-br ${categoryGradients[post.category ?? ""] || "from-primary/15 to-sage/10"} flex items-center justify-center mb-10 relative overflow-hidden`}>
-          <div className="absolute -top-10 -right-10 h-40 w-40 blob-shape-1 bg-white/10 blur-xl" />
+          <div className="absolute -top-10 -right-10 h-40 w-40 blob-shape-1 bg-warm-cream/10 blur-xl" />
           <span className="text-5xl text-primary/20 font-extrabold">{post.category}</span>
         </div>
 

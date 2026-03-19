@@ -20,7 +20,7 @@ export default function AdminInsightsPage() {
 
   useEffect(() => { loadInsights(); }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Delete this insight?")) return;
     await fetch(`/api/insights/${id}`, { method: "DELETE" });
     loadInsights();
@@ -45,7 +45,7 @@ export default function AdminInsightsPage() {
         {insights.map((post) => (
           <Card key={post.id} className="rounded-2xl border-none ring-0 shadow-warm">
             <CardContent className="flex items-start justify-between p-6">
-              <div>
+              <div className="min-w-0 flex-1">
                 <h3 className="font-bold text-lg">{post.title}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{post.author} {post.publishedDate && `| ${post.publishedDate}`}</p>
                 {post.excerpt && <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{post.excerpt}</p>}

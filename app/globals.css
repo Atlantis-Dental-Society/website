@@ -8,18 +8,18 @@
     /* Warm Organic Soft — Light Mode */
     --background: #FAF5ED;
     --foreground: #2D2419;
-    --card: #FFFFFF;
+    --card: #FDF8F1;
     --card-foreground: #2D2419;
-    --popover: #FFFFFF;
+    --popover: #FDF8F1;
     --popover-foreground: #2D2419;
     --primary: #D4AF37;
     --primary-foreground: #2D2419;
     --secondary: #7B916F;
-    --secondary-foreground: #FFFFFF;
+    --secondary-foreground: #FAF5ED;
     --muted: #F0E8DA;
     --muted-foreground: #7A6B5D;
     --accent: #C4856A;
-    --accent-foreground: #FFFFFF;
+    --accent-foreground: #FAF5ED;
     --destructive: #C0392B;
     --border: #E4D9C8;
     --input: #E4D9C8;
@@ -135,6 +135,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-wrap: break-word;
   }
   html {
     @apply font-sans;

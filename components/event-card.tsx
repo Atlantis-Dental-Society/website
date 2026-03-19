@@ -20,7 +20,7 @@ export function EventCard({ event: e, isPast }: EventCardProps) {
             {new Date(e.date + "T00:00:00").toLocaleString("en", { month: "short" })}
           </span>
         </div>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <div className="flex items-start gap-3">
             <h3 className="text-xl font-bold group-hover:text-primary transition-colors">{e.title}</h3>
             {e.featured && (

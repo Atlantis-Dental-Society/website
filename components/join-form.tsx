@@ -1,11 +1,11 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { joinSubmissionSchema } from "@/lib/validations";
+import { joinSubmissionSchema, type JoinSubmissionInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
@@ -31,20 +31,18 @@ export function JoinForm() {
       school: "",
       interestInDentistry: "",
       whyDentistry: "",
+    } as JoinSubmissionInput,
+    validators: {
+      onSubmit: joinSubmissionSchema,
+      onChange: joinSubmissionSchema,
     },
     onSubmit: async ({ value }) => {
-      const result = joinSubmissionSchema.safeParse(value);
-      if (!result.success) {
-        setStatus("error");
-        setErrorMessage(result.error.issues[0]?.message || "Validation failed");
-        return;
-      }
-
+      setErrorMessage("");
       try {
         const res = await fetch("/api/join", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(result.data),
+          body: JSON.stringify(value),
         });
 
         if (!res.ok) {
@@ -98,51 +96,67 @@ export function JoinForm() {
           }}
         >
           <div className="grid gap-5 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Name *</Label>
-              <form.Field name="name">
-                {(field) => (
-                  <Input
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Your full name"
-                  />
-                )}
-              </form.Field>
-            </div>
-            <div className="space-y-2">
-              <Label>Email *</Label>
-              <form.Field name="email">
-                {(field) => (
-                  <Input
-                    type="email"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="you@example.com"
-                  />
-                )}
-              </form.Field>
-            </div>
+            <form.Field name="name">
+              {(f) => {
+                const isInvalid = f.state.meta.isTouched && !f.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid || undefined}>
+                    <FieldLabel htmlFor="join-name">Name *</FieldLabel>
+                    <Input
+                      id="join-name"
+                      value={f.state.value}
+                      onBlur={f.handleBlur}
+                      onChange={(e) => f.handleChange(e.target.value)}
+                      placeholder="Your full name"
+                      aria-invalid={isInvalid || undefined}
+                    />
+                    {isInvalid && <FieldError errors={f.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            </form.Field>
+            <form.Field name="email">
+              {(f) => {
+                const isInvalid = f.state.meta.isTouched && !f.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid || undefined}>
+                    <FieldLabel htmlFor="join-email">Email *</FieldLabel>
+                    <Input
+                      id="join-email"
+                      type="email"
+                      value={f.state.value}
+                      onBlur={f.handleBlur}
+                      onChange={(e) => f.handleChange(e.target.value)}
+                      placeholder="you@example.com"
+                      aria-invalid={isInvalid || undefined}
+                    />
+                    {isInvalid && <FieldError errors={f.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            </form.Field>
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Major</Label>
-              <form.Field name="major">
-                {(field) => (
+            <form.Field name="major">
+              {(f) => (
+                <Field>
+                  <FieldLabel htmlFor="join-major">Major</FieldLabel>
                   <Input
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    id="join-major"
+                    value={f.state.value}
+                    onBlur={f.handleBlur}
+                    onChange={(e) => f.handleChange(e.target.value)}
                     placeholder="e.g. Biology"
                   />
-                )}
-              </form.Field>
-            </div>
-            <div className="space-y-2">
-              <Label>Year of Study</Label>
-              <form.Field name="year">
-                {(field) => (
-                  <Select value={field.state.value} onValueChange={(v) => field.handleChange(v)}>
+                </Field>
+              )}
+            </form.Field>
+            <form.Field name="year">
+              {(f) => (
+                <Field>
+                  <FieldLabel>Year of Study</FieldLabel>
+                  <Select value={f.state.value} onValueChange={(v) => f.handleChange(v)}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
@@ -155,51 +169,57 @@ export function JoinForm() {
                       <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
-                )}
-              </form.Field>
-            </div>
+                </Field>
+              )}
+            </form.Field>
           </div>
 
-          <div className="space-y-2">
-            <Label>School</Label>
-            <form.Field name="school">
-              {(field) => (
+          <form.Field name="school">
+            {(f) => (
+              <Field>
+                <FieldLabel htmlFor="join-school">School</FieldLabel>
                 <Input
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  id="join-school"
+                  value={f.state.value}
+                  onBlur={f.handleBlur}
+                  onChange={(e) => f.handleChange(e.target.value)}
                   placeholder="e.g. York University"
                 />
-              )}
-            </form.Field>
-          </div>
+              </Field>
+            )}
+          </form.Field>
 
-          <div className="space-y-2">
-            <Label>What interests you about dentistry?</Label>
-            <form.Field name="interestInDentistry">
-              {(field) => (
+          <form.Field name="interestInDentistry">
+            {(f) => (
+              <Field>
+                <FieldLabel htmlFor="join-interest">What interests you about dentistry?</FieldLabel>
                 <Textarea
+                  id="join-interest"
                   rows={3}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  value={f.state.value}
+                  onBlur={f.handleBlur}
+                  onChange={(e) => f.handleChange(e.target.value)}
                   placeholder="Tell us about your interest in dentistry..."
                 />
-              )}
-            </form.Field>
-          </div>
+              </Field>
+            )}
+          </form.Field>
 
-          <div className="space-y-2">
-            <Label>Why do you want to become a dentist?</Label>
-            <form.Field name="whyDentistry">
-              {(field) => (
+          <form.Field name="whyDentistry">
+            {(f) => (
+              <Field>
+                <FieldLabel htmlFor="join-why">Why do you want to become a dentist?</FieldLabel>
                 <Textarea
+                  id="join-why"
                   rows={3}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  value={f.state.value}
+                  onBlur={f.handleBlur}
+                  onChange={(e) => f.handleChange(e.target.value)}
                   placeholder="Share your motivation..."
                 />
-              )}
-            </form.Field>
-          </div>
+              </Field>
+            )}
+          </form.Field>
 
           <Button type="submit" className="w-full rounded-full py-6 text-base gap-2 shadow-gold" size="lg">
             <Send className="h-4 w-4" />

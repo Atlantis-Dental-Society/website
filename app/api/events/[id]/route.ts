@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const [event] = await db.select().from(events).where(eq(events.id, Number(id)));
+    const [event] = await db.select().from(events).where(eq(events.id, id));
     if (!event) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(event);
   } catch {
@@ -31,7 +31,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const [updated] = await db
       .update(events)
       .set({ ...result.data, updatedAt: new Date() })
-      .where(eq(events.id, Number(id)))
+      .where(eq(events.id, id))
       .returning();
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -44,7 +44,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const [deleted] = await db.delete(events).where(eq(events.id, Number(id))).returning();
+    const [deleted] = await db.delete(events).where(eq(events.id, id)).returning();
     if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch {

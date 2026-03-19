@@ -1,7 +1,7 @@
-import { pgTable, serial, text, timestamp, boolean, date } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean, date } from "drizzle-orm/pg-core";
 
 export const events = pgTable("events", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
   date: date("date").notNull(),
@@ -17,7 +17,7 @@ export const events = pgTable("events", {
 });
 
 export const insights = pgTable("insights", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   slug: text("slug").notNull().unique(),
   title: text("title").notNull(),
   excerpt: text("excerpt"),
@@ -33,7 +33,7 @@ export const insights = pgTable("insights", {
 });
 
 export const joinSubmissions = pgTable("join_submissions", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   major: text("major"),

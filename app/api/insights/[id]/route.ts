@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const [insight] = await db.select().from(insights).where(eq(insights.id, Number(id)));
+    const [insight] = await db.select().from(insights).where(eq(insights.id, id));
     if (!insight) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(insight);
   } catch {
@@ -31,7 +31,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const [updated] = await db
       .update(insights)
       .set({ ...result.data, updatedAt: new Date() })
-      .where(eq(insights.id, Number(id)))
+      .where(eq(insights.id, id))
       .returning();
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -44,7 +44,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const [deleted] = await db.delete(insights).where(eq(insights.id, Number(id))).returning();
+    const [deleted] = await db.delete(insights).where(eq(insights.id, id)).returning();
     if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch {

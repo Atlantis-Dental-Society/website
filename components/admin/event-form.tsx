@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   DialogHeader,
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
 
-export type Event = EventInput & { id: number; createdAt: string; updatedAt: string };
+export type Event = EventInput & { id: string; createdAt: string; updatedAt: string };
 
 interface EventFormProps {
   initial: Event | null;
@@ -39,20 +39,19 @@ export function EventForm({ initial, onDone }: EventFormProps) {
       registrationUrl: initial?.registrationUrl ?? "",
       featured: initial?.featured ?? false,
       published: initial?.published ?? true,
+    } as EventInput,
+    validators: {
+      onSubmit: eventSchema,
+      onChange: eventSchema,
     },
     onSubmit: async ({ value }) => {
-      const result = eventSchema.safeParse(value);
-      if (!result.success) {
-        setError(result.error.issues[0]?.message || "Validation failed");
-        return;
-      }
-
+      setError("");
       const url = initial ? `/api/events/${initial.id}` : "/api/events";
       const method = initial ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.data),
+        body: JSON.stringify(value),
       });
 
       if (!res.ok) {
@@ -82,61 +81,89 @@ export function EventForm({ initial, onDone }: EventFormProps) {
 
       <FieldGroup className="mt-4">
         <FieldGroup className="flex-row">
-          <Field>
-            <FieldLabel htmlFor="evt-title">Title *</FieldLabel>
-            <form.Field name="title">
-              {(f) => <Input id="evt-title" value={f.state.value} onChange={(e) => f.handleChange(e.target.value)} />}
-            </form.Field>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="evt-category">Category</FieldLabel>
-            <form.Field name="category">
-              {(f) => <Input id="evt-category" value={f.state.value} onChange={(e) => f.handleChange(e.target.value)} placeholder="e.g. Workshop" />}
-            </form.Field>
-          </Field>
-        </FieldGroup>
-
-        <Field>
-          <FieldLabel htmlFor="evt-desc">Description</FieldLabel>
-          <form.Field name="description">
-            {(f) => <Textarea id="evt-desc" value={f.state.value} onChange={(e) => f.handleChange(e.target.value)} rows={3} />}
+          <form.Field name="title">
+            {(f) => {
+              const isInvalid = f.state.meta.isTouched && !f.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="evt-title">Title *</FieldLabel>
+                  <Input id="evt-title" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} aria-invalid={isInvalid || undefined} />
+                  {isInvalid && <FieldError errors={f.state.meta.errors} />}
+                </Field>
+              );
+            }}
           </form.Field>
-        </Field>
+          <form.Field name="category">
+            {(f) => (
+              <Field>
+                <FieldLabel htmlFor="evt-category">Category</FieldLabel>
+                <Input id="evt-category" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} placeholder="e.g. Workshop" />
+              </Field>
+            )}
+          </form.Field>
+        </FieldGroup>
+
+        <form.Field name="description">
+          {(f) => (
+            <Field>
+              <FieldLabel htmlFor="evt-desc">Description</FieldLabel>
+              <Textarea id="evt-desc" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} rows={3} />
+            </Field>
+          )}
+        </form.Field>
 
         <FieldGroup className="flex-row">
-          <Field>
-            <FieldLabel htmlFor="evt-date">Date *</FieldLabel>
-            <form.Field name="date">
-              {(f) => <Input type="date" id="evt-date" value={f.state.value} onChange={(e) => f.handleChange(e.target.value)} />}
-            </form.Field>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="evt-end-date">End Date</FieldLabel>
-            <form.Field name="endDate">
-              {(f) => <Input type="date" id="evt-end-date" value={f.state.value} onChange={(e) => f.handleChange(e.target.value)} />}
-            </form.Field>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="evt-time">Time</FieldLabel>
-            <form.Field name="time">
-              {(f) => <Input type="time" id="evt-time" value={f.state.value} onChange={(e) => f.handleChange(e.target.value)} />}
-            </form.Field>
-          </Field>
+          <form.Field name="date">
+            {(f) => {
+              const isInvalid = f.state.meta.isTouched && !f.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="evt-date">Date *</FieldLabel>
+                  <Input type="date" id="evt-date" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} aria-invalid={isInvalid || undefined} />
+                  {isInvalid && <FieldError errors={f.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+          <form.Field name="endDate">
+            {(f) => (
+              <Field>
+                <FieldLabel htmlFor="evt-end-date">End Date</FieldLabel>
+                <Input type="date" id="evt-end-date" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} />
+              </Field>
+            )}
+          </form.Field>
+          <form.Field name="time">
+            {(f) => (
+              <Field>
+                <FieldLabel htmlFor="evt-time">Time</FieldLabel>
+                <Input type="time" id="evt-time" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} />
+              </Field>
+            )}
+          </form.Field>
         </FieldGroup>
 
         <FieldGroup className="flex-row">
-          <Field>
-            <FieldLabel htmlFor="evt-location">Location</FieldLabel>
-            <form.Field name="location">
-              {(f) => <Input id="evt-location" value={f.state.value} onChange={(e) => f.handleChange(e.target.value)} />}
-            </form.Field>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="evt-reg-url">Registration URL</FieldLabel>
-            <form.Field name="registrationUrl">
-              {(f) => <Input id="evt-reg-url" value={f.state.value} onChange={(e) => f.handleChange(e.target.value)} />}
-            </form.Field>
-          </Field>
+          <form.Field name="location">
+            {(f) => (
+              <Field>
+                <FieldLabel htmlFor="evt-location">Location</FieldLabel>
+                <Input id="evt-location" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} />
+              </Field>
+            )}
+          </form.Field>
+          <form.Field name="registrationUrl">
+            {(f) => {
+              const isInvalid = f.state.meta.isTouched && !f.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="evt-reg-url">Registration URL</FieldLabel>
+                  <Input id="evt-reg-url" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} aria-invalid={isInvalid || undefined} />
+                  {isInvalid && <FieldError errors={f.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
         </FieldGroup>
 
         <div className="flex gap-6">

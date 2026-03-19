@@ -20,7 +20,7 @@ export default function AdminEventsPage() {
 
   useEffect(() => { loadEvents(); }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Delete this event?")) return;
     await fetch(`/api/events/${id}`, { method: "DELETE" });
     loadEvents();
@@ -45,7 +45,7 @@ export default function AdminEventsPage() {
         {events.map((e) => (
           <Card key={e.id} className="rounded-2xl border-none ring-0 shadow-warm">
             <CardContent className="flex items-start justify-between p-6">
-              <div>
+              <div className="min-w-0 flex-1">
                 <h3 className="font-bold text-lg">{e.title}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{e.date} {e.time && `| ${e.time}`} {e.location && `| ${e.location}`}</p>
                 {e.description && <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{e.description}</p>}
