@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Leaf, Menu, LogIn, UserPlus } from "lucide-react";
+import { Leaf, Menu, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -60,22 +60,13 @@ export function Header() {
           <ThemeToggle />
 
           {!session ? (
-            <div className="hidden items-center gap-1.5 lg:flex">
-              <Button asChild variant="ghost" size="sm" className="rounded-full gap-1.5">
-                <Link href="/login">
-                  <LogIn className="h-3.5 w-3.5" />
-                  Login
-                </Link>
-              </Button>
-              <Button asChild size="sm" className="rounded-full gap-1.5 shadow-gold">
-                <Link href="/signup">
-                  <UserPlus className="h-3.5 w-3.5" />
-                  Sign Up
-                </Link>
-              </Button>
-            </div>
+            <Button asChild variant="ghost" size="icon" className="rounded-2xl bg-primary/10 text-primary hover:bg-primary/20" aria-label="Login">
+              <Link href="/login">
+                <LogIn className="h-5 w-5" />
+              </Link>
+            </Button>
           ) : (
-            <Button asChild variant="ghost" size="sm" className="hidden rounded-full lg:inline-flex">
+            <Button asChild variant="ghost" size="sm" className="rounded-full">
               <Link href="/admin">Dashboard</Link>
             </Button>
           )}
@@ -113,18 +104,11 @@ export function Header() {
                 ))}
                 <div className="my-2 h-px bg-border/30" />
                 {!session ? (
-                  <>
-                    <SheetClose asChild>
-                      <Link href="/login" className="rounded-2xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary">
-                        Login
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link href="/signup" className="rounded-2xl px-4 py-2.5 text-sm font-medium text-primary transition-all hover:bg-primary/10">
-                        Sign Up
-                      </Link>
-                    </SheetClose>
-                  </>
+                  <SheetClose asChild>
+                    <Link href="/login" className="rounded-2xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary">
+                      Login
+                    </Link>
+                  </SheetClose>
                 ) : (
                   <SheetClose asChild>
                     <Link href="/admin" className="rounded-2xl px-4 py-2.5 text-sm font-medium text-primary transition-all hover:bg-primary/10">

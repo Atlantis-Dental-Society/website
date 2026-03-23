@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod/v4";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,8 +20,10 @@ const signupSchema = z
     email: z.string().email("Please enter a valid email address"),
     phone: z
       .string()
-      .min(10, "Please enter a valid phone number")
-      .regex(/^[\d\s+\-()]+$/, "Please enter a valid phone number"),
+      .min(1, "Phone number is required")
+      .refine((val) => isValidPhoneNumber(val, "CA"), {
+        message: "Please enter a valid phone number (e.g. +1 416 555 0123)",
+      }),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
   })
