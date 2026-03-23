@@ -63,9 +63,9 @@ export default async function AboutPage() {
       {/* Item-based sections as feature grids */}
       {sections
         .filter((s) => s.items && s.items.length > 0)
-        .map((section, i) => {
+        .map((section, idx) => {
           const items = (section.items ?? []).filter((i): i is NonNullable<typeof i> => !!i);
-          const isAlt = i % 2 === 0;
+          const isAlt = idx % 2 === 0;
           const color = isAlt ? "sage" : "primary";
           const colorMap = {
             sage: { bg: "bg-sage/10", text: "text-sage", gradient: "from-sage/8 to-sage/3" },
