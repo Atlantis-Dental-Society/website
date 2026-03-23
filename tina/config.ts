@@ -64,6 +64,9 @@ export default defineConfig({
             name: "sections",
             label: "Sections",
             list: true,
+            ui: {
+              itemProps: (item) => ({ label: item?.heading || item?.id || "Section" }),
+            },
             fields: [
               { type: "string", name: "id", label: "Section ID" },
               { type: "string", name: "heading", label: "Heading" },
@@ -73,6 +76,9 @@ export default defineConfig({
                 name: "items",
                 label: "Items",
                 list: true,
+                ui: {
+                  itemProps: (item) => ({ label: item?.title || "Item" }),
+                },
                 fields: [
                   { type: "string", name: "title", label: "Title" },
                   { type: "string", name: "description", label: "Description", ui: { component: "textarea" } },
