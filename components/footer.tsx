@@ -67,7 +67,7 @@ export function Footer() {
 
         <div className="flex flex-col items-center gap-3 pt-8">
           <div className="flex items-center gap-1 text-xs text-muted-foreground/60">
-            Made with <Heart className="h-3 w-3 text-terracotta fill-terracotta" /> for future dental professionals
+            Made with <Heart className="h-3 w-3 text-terracotta fill-terracotta" /> by <Link href={'https://t.me/FarhanZare1010'}>FZ1010</Link>
           </div>
           <div className="text-center text-xs text-muted-foreground/60">
             &copy; {new Date().getFullYear()} Atlantis Dental Society. All rights reserved.
