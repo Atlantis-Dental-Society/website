@@ -1,9 +1,10 @@
 import { describe, it, expect, afterAll } from "vitest";
 
 const BASE = "http://localhost:3000";
-const createdIds: { events: string[]; insights: string[]; joins: string[] } = {
+const createdIds: { events: string[]; insights: string[]; photos: string[]; joins: string[] } = {
   events: [],
   insights: [],
+  photos: [],
   joins: [],
 };
 
@@ -344,9 +345,144 @@ describe("POST /api/join", () => {
   });
 });
 
+// ─── Upload API ─────────────────────────────────────────────────────────────
+
+describe("POST /api/upload", () => {
+  it("returns presigned URL for valid image upload", async () => {
+    const eventId = createdIds.events[0];
+    if (!eventId) return;
+    const res = await fetch(`${BASE}/api/upload`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: "test-photo.jpg",
+        contentType: "image/jpeg",
+        entityType: "events",
+        entityId: eventId,
+      }),
+    });
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.presignedUrl).toBeDefined();
+    expect(data.publicUrl).toMatch(/cloudfront\.net|ads-atlantis-media/);
+    expect(data.key).toContain("events/");
+    expect(data.key).toContain(".jpg");
+    // Key should use UUID filename, not original name
+    expect(data.key).not.toContain("test-photo");
+  });
+
+  it("rejects non-image content type", async () => {
+    const res = await fetch(`${BASE}/api/upload`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: "doc.pdf",
+        contentType: "application/pdf",
+        entityType: "events",
+        entityId: "some-id",
+      }),
+    });
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain("image");
+  });
+
+  it("rejects invalid entity type", async () => {
+    const res = await fetch(`${BASE}/api/upload`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: "photo.jpg",
+        contentType: "image/jpeg",
+        entityType: "users",
+        entityId: "some-id",
+      }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects missing fields", async () => {
+    const res = await fetch(`${BASE}/api/upload`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename: "photo.jpg" }),
+    });
+    expect(res.status).toBe(400);
+  });
+});
+
+// ─── Photos API ─────────────────────────────────────────────────────────────
+
+describe("POST /api/photos", () => {
+  it("creates a photo record", async () => {
+    const eventId = createdIds.events[0];
+    if (!eventId) return;
+    const res = await fetch(`${BASE}/api/photos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        entityType: "events",
+        entityId: eventId,
+        url: "https://ads-atlantis-media.s3.us-east-1.amazonaws.com/events/test/photo.jpg",
+        key: "events/test/photo.jpg",
+        order: "0",
+      }),
+    });
+    expect(res.status).toBe(201);
+    const data = await res.json();
+    expect(data.id).toBeDefined();
+    expect(data.entityType).toBe("events");
+    expect(data.url).toContain("photo.jpg");
+    createdIds.photos.push(data.id);
+  });
+
+  it("rejects photo without required fields", async () => {
+    const res = await fetch(`${BASE}/api/photos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ entityType: "events" }),
+    });
+    expect(res.status).toBe(400);
+  });
+});
+
+describe("GET /api/photos", () => {
+  it("returns photos for a specific entity", async () => {
+    const eventId = createdIds.events[0];
+    if (!eventId) return;
+    const res = await fetch(`${BASE}/api/photos?entityType=events&entityId=${eventId}`);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(Array.isArray(data)).toBe(true);
+    expect(data.length).toBeGreaterThan(0);
+  });
+
+  it("returns empty array for entity with no photos", async () => {
+    const res = await fetch(`${BASE}/api/photos?entityType=events&entityId=00000000-0000-0000-0000-000000000000`);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data).toEqual([]);
+  });
+
+  it("rejects missing query params", async () => {
+    const res = await fetch(`${BASE}/api/photos`);
+    expect(res.status).toBe(400);
+  });
+});
+
+describe("DELETE /api/photos/:id", () => {
+  it("returns 404 for non-existent photo", async () => {
+    const res = await fetch(`${BASE}/api/photos/00000000-0000-0000-0000-000000000000`, { method: "DELETE" });
+    expect(res.status).toBe(404);
+  });
+});
+
 // ─── Cleanup ─────────────────────────────────────────────────────────────────
 
 afterAll(async () => {
+  for (const id of createdIds.photos) {
+    await fetch(`${BASE}/api/photos/${id}`, { method: "DELETE" });
+  }
   for (const id of createdIds.events) {
     await fetch(`${BASE}/api/events/${id}`, { method: "DELETE" });
   }

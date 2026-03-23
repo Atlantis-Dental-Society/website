@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "@tanstack/react-form";
 import { eventSchema, type EventInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
+import { PhotoUploader, type Photo } from "@/components/admin/photo-uploader";
 
 export type Event = EventInput & { id: string; createdAt: string; updatedAt: string };
 
@@ -26,6 +27,17 @@ interface EventFormProps {
 
 export function EventForm({ initial, onDone }: EventFormProps) {
   const [error, setError] = useState("");
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [eventId, setEventId] = useState<string | null>(initial?.id ?? null);
+
+  const loadPhotos = useCallback(async (id: string) => {
+    const res = await fetch(`/api/photos?entityType=events&entityId=${id}`);
+    if (res.ok) setPhotos(await res.json());
+  }, []);
+
+  useEffect(() => {
+    if (initial?.id) loadPhotos(initial.id);
+  }, [initial?.id, loadPhotos]);
 
   const form = useForm({
     defaultValues: {
@@ -59,6 +71,13 @@ export function EventForm({ initial, onDone }: EventFormProps) {
         setError(data.error || "Failed to save");
         return;
       }
+
+      // If creating new event, get the ID for photo uploads
+      if (!initial) {
+        const created = await res.json();
+        setEventId(created.id);
+      }
+
       onDone();
     },
   });
@@ -184,6 +203,19 @@ export function EventForm({ initial, onDone }: EventFormProps) {
             )}
           </form.Field>
         </div>
+
+        {/* Photo uploader - only shown when editing (event already has an ID) */}
+        {eventId && (
+          <PhotoUploader
+            entityType="events"
+            entityId={eventId}
+            photos={photos}
+            onPhotosChange={setPhotos}
+          />
+        )}
+        {!eventId && (
+          <p className="text-xs text-muted-foreground">Save the event first, then you can add photos.</p>
+        )}
       </FieldGroup>
 
       <DialogFooter className="mt-4">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CalendarDays, MapPin, Clock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,9 +9,10 @@ import type { events } from "@/lib/schema";
 interface EventCardProps {
   event: typeof events.$inferSelect;
   isPast?: boolean;
+  photos?: { id: string; url: string }[];
 }
 
-export function EventCard({ event: e, isPast }: EventCardProps) {
+export function EventCard({ event: e, isPast, photos }: EventCardProps) {
   return (
     <Card className={`group rounded-3xl border-none ring-0 shadow-warm hover:shadow-warm-lg transition-all ${isPast ? "opacity-70" : ""}`}>
       <CardContent className="flex flex-col gap-6 p-8 md:flex-row md:items-start">
@@ -22,7 +24,7 @@ export function EventCard({ event: e, isPast }: EventCardProps) {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start gap-3">
-            <h3 className="text-xl font-bold group-hover:text-primary transition-colors">{e.title}</h3>
+            <Link href={`/events/${e.id}`} className="text-xl font-bold group-hover:text-primary transition-colors hover:underline">{e.title}</Link>
             {e.featured && (
               <Badge variant="secondary" className="h-auto shrink-0 gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                 <Star className="h-3 w-3 fill-primary" />
@@ -49,6 +51,23 @@ export function EventCard({ event: e, isPast }: EventCardProps) {
             )}
           </div>
           {e.description && <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{e.description}</p>}
+
+          {/* Photo thumbnails */}
+          {photos && photos.length > 0 && (
+            <div className="mt-4 flex gap-2 overflow-x-auto">
+              {photos.slice(0, 4).map((photo) => (
+                <div key={photo.id} className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+                  <Image src={photo.url} alt="" fill className="object-cover" sizes="64px" />
+                </div>
+              ))}
+              {photos.length > 4 && (
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground font-medium">
+                  +{photos.length - 4}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="mt-5 flex items-center gap-3">
             {e.registrationUrl && !isPast && (
               <Button size="sm" className="rounded-full px-6 shadow-gold" asChild>

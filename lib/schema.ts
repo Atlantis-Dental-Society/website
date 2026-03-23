@@ -32,6 +32,16 @@ export const insights = pgTable("insights", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const photos = pgTable("photos", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  entityType: text("entity_type").notNull(), // "event" or "insight"
+  entityId: uuid("entity_id").notNull(),
+  url: text("url").notNull(),
+  key: text("key").notNull(),
+  order: text("sort_order").default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const joinSubmissions = pgTable("join_submissions", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),

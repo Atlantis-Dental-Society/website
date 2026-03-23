@@ -1,7 +1,7 @@
 import { getPageContent } from "@/lib/tina";
 import { db } from "@/lib/db";
-import { events } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { events, photos } from "@/lib/schema";
+import { eq, and, inArray } from "drizzle-orm";
 import { CalendarDays, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHero } from "@/components/page-hero";
@@ -21,6 +21,18 @@ export default async function EventsPage() {
 
   const upcoming = allEvents.filter((e) => e.date >= today);
   const past = allEvents.filter((e) => e.date < today);
+
+  // Fetch all photos for these events in one query
+  const eventIds = allEvents.map((e) => e.id);
+  const allPhotos = eventIds.length > 0
+    ? await db.select().from(photos).where(and(eq(photos.entityType, "events"), inArray(photos.entityId, eventIds))).orderBy(photos.order)
+    : [];
+  const photosByEvent = new Map<string, typeof allPhotos>();
+  for (const p of allPhotos) {
+    const list = photosByEvent.get(p.entityId) ?? [];
+    list.push(p);
+    photosByEvent.set(p.entityId, list);
+  }
 
   return (
     <>
@@ -60,7 +72,7 @@ export default async function EventsPage() {
           ) : (
             <div className="space-y-6">
               {upcoming.map((e) => (
-                <EventCard key={e.id} event={e} />
+                <EventCard key={e.id} event={e} photos={photosByEvent.get(e.id)} />
               ))}
             </div>
           )}
@@ -76,7 +88,7 @@ export default async function EventsPage() {
               </div>
               <div className="space-y-6">
                 {past.map((e) => (
-                  <EventCard key={e.id} event={e} isPast />
+                  <EventCard key={e.id} event={e} isPast photos={photosByEvent.get(e.id)} />
                 ))}
               </div>
             </>

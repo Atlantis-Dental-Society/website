@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { insights } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { insights, photos } from "@/lib/schema";
+import { eq, and } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CalendarDays, User } from "lucide-react";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArticleRenderer } from "@/components/article-renderer";
+import { PhotoGallery } from "@/components/photo-gallery";
 import { categoryGradients } from "@/lib/insights-config";
 
 export default async function InsightPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -21,6 +22,12 @@ export default async function InsightPage({ params }: { params: Promise<{ slug: 
 
   const post = results[0];
   if (!post) notFound();
+
+  const postPhotos = await db
+    .select()
+    .from(photos)
+    .where(and(eq(photos.entityType, "insights"), eq(photos.entityId, post.id)))
+    .orderBy(photos.order);
 
   return (
     <article className="relative overflow-hidden py-16 sm:py-20">
@@ -66,6 +73,12 @@ export default async function InsightPage({ params }: { params: Promise<{ slug: 
         </div>
 
         <Separator className="mt-10 bg-gradient-to-r from-transparent via-border to-transparent" />
+
+        {postPhotos.length > 0 && (
+          <div className="mt-10">
+            <PhotoGallery photos={postPhotos} />
+          </div>
+        )}
 
         {post.body && <ArticleRenderer body={post.body} />}
       </div>

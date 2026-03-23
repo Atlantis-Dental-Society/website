@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "@tanstack/react-form";
 import { insightSchema, type InsightInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
 import { slugify } from "@/lib/utils";
+import { PhotoUploader, type Photo } from "@/components/admin/photo-uploader";
 
 export type Insight = InsightInput & { id: string; createdAt: string; updatedAt: string };
 
@@ -27,6 +28,17 @@ interface InsightFormProps {
 
 export function InsightForm({ initial, onDone }: InsightFormProps) {
   const [error, setError] = useState("");
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [insightId, setInsightId] = useState<string | null>(initial?.id ?? null);
+
+  const loadPhotos = useCallback(async (id: string) => {
+    const res = await fetch(`/api/photos?entityType=insights&entityId=${id}`);
+    if (res.ok) setPhotos(await res.json());
+  }, []);
+
+  useEffect(() => {
+    if (initial?.id) loadPhotos(initial.id);
+  }, [initial?.id, loadPhotos]);
 
   const form = useForm({
     defaultValues: {
@@ -60,6 +72,12 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
         setError(d.error || "Failed to save");
         return;
       }
+
+      if (!initial) {
+        const created = await res.json();
+        setInsightId(created.id);
+      }
+
       onDone();
     },
   });
@@ -186,6 +204,19 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
             </Field>
           )}
         </form.Field>
+
+        {/* Photo uploader */}
+        {insightId && (
+          <PhotoUploader
+            entityType="insights"
+            entityId={insightId}
+            photos={photos}
+            onPhotosChange={setPhotos}
+          />
+        )}
+        {!insightId && (
+          <p className="text-xs text-muted-foreground">Save the insight first, then you can add photos.</p>
+        )}
       </FieldGroup>
 
       <DialogFooter className="mt-4">
