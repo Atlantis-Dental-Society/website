@@ -16,3 +16,6 @@ drizzle/
 /.vercel/README.txt
 /.idea/var-4.iml
 /.idea/vcs.xml
+infra/cdk.out/
+infra/node_modules/
+infra/package-lock.json
