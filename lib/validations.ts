@@ -3,6 +3,7 @@ import { z } from "zod/v4";
 const optionalStr = z.string().optional().transform((v) => (v === "" ? null : v));
 
 export const eventSchema = z.object({
+  id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   description: optionalStr,
   date: z.string().min(1, "Date is required"),
@@ -21,6 +22,7 @@ export const eventSchema = z.object({
 });
 
 export const insightSchema = z.object({
+  id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
   slug: z.string().min(1, "Slug is required"),
   excerpt: optionalStr,

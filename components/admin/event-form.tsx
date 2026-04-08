@@ -26,7 +26,7 @@ interface EventFormProps {
 
 export function EventForm({ initial, onDone }: EventFormProps) {
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [eventId, setEventId] = useState<string | null>(initial?.id ?? null);
+  const [eventId] = useState(() => initial?.id ?? crypto.randomUUID());
 
   const loadPhotos = useCallback(async (id: string) => {
     const res = await fetch(`/api/photos?entityType=events&entityId=${id}`);
@@ -57,10 +57,11 @@ export function EventForm({ initial, onDone }: EventFormProps) {
     onSubmit: async ({ value }) => {
       const url = initial ? `/api/events/${initial.id}` : "/api/events";
       const method = initial ? "PUT" : "POST";
+      const payload = initial ? value : { ...value, id: eventId };
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(value),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -69,18 +70,17 @@ export function EventForm({ initial, onDone }: EventFormProps) {
         return;
       }
 
-      // If creating new event, get the ID for photo uploads
-      if (!initial) {
-        const created = await res.json();
-        setEventId(created.id);
-      }
-
       onDone();
     },
   });
 
+  const submitWith = (published: boolean) => {
+    form.setFieldValue("published", published);
+    form.handleSubmit();
+  };
+
   return (
-    <form onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}>
+    <form onSubmit={(e) => { e.preventDefault(); submitWith(form.state.values.published ?? true); }}>
       <DialogHeader>
         <DialogTitle>{initial ? "Edit Event" : "Add Event"}</DialogTitle>
         <DialogDescription>
@@ -175,41 +175,30 @@ export function EventForm({ initial, onDone }: EventFormProps) {
           </form.Field>
         </FieldGroup>
 
-        <div className="flex gap-6">
-          <form.Field name="featured">
-            {(f) => (
-              <Field orientation="horizontal">
-                <Checkbox id="evt-featured" checked={f.state.value} onCheckedChange={(v) => f.handleChange(v === true)} />
-                <FieldLabel htmlFor="evt-featured">Featured</FieldLabel>
-              </Field>
-            )}
-          </form.Field>
-          <form.Field name="published">
-            {(f) => (
-              <Field orientation="horizontal">
-                <Checkbox id="evt-published" checked={f.state.value} onCheckedChange={(v) => f.handleChange(v === true)} />
-                <FieldLabel htmlFor="evt-published">Published</FieldLabel>
-              </Field>
-            )}
-          </form.Field>
-        </div>
+        <form.Field name="featured">
+          {(f) => (
+            <Field orientation="horizontal">
+              <Checkbox id="evt-featured" checked={f.state.value} onCheckedChange={(v) => f.handleChange(v === true)} />
+              <FieldLabel htmlFor="evt-featured">Featured</FieldLabel>
+            </Field>
+          )}
+        </form.Field>
 
-        {/* Photo uploader - only shown when editing (event already has an ID) */}
-        {eventId && (
-          <PhotoUploader
-            entityType="events"
-            entityId={eventId}
-            photos={photos}
-            onPhotosChange={setPhotos}
-          />
-        )}
-        {!eventId && (
-          <p className="text-xs text-muted-foreground">Save the event first, then you can add photos.</p>
-        )}
+        <PhotoUploader
+          entityType="events"
+          entityId={eventId}
+          photos={photos}
+          onPhotosChange={setPhotos}
+        />
       </FieldGroup>
 
-      <DialogFooter className="mt-4">
-        <Button type="submit" className="rounded-full">{initial ? "Update" : "Create"} Event</Button>
+      <DialogFooter className="mt-4 gap-2">
+        <Button type="button" variant="outline" className="rounded-full" onClick={() => submitWith(false)}>
+          Save as Draft
+        </Button>
+        <Button type="button" className="rounded-full" onClick={() => submitWith(true)}>
+          Publish
+        </Button>
       </DialogFooter>
     </form>
   );

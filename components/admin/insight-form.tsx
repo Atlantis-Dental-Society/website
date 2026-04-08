@@ -6,7 +6,6 @@ import { insightSchema, type InsightInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
 import {
   DialogHeader,
@@ -27,7 +26,7 @@ interface InsightFormProps {
 
 export function InsightForm({ initial, onDone }: InsightFormProps) {
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [insightId, setInsightId] = useState<string | null>(initial?.id ?? null);
+  const [insightId] = useState(() => initial?.id ?? crypto.randomUUID());
 
   const loadPhotos = useCallback(async (id: string) => {
     const res = await fetch(`/api/photos?entityType=insights&entityId=${id}`);
@@ -58,10 +57,11 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
     onSubmit: async ({ value }) => {
       const url = initial ? `/api/insights/${initial.id}` : "/api/insights";
       const method = initial ? "PUT" : "POST";
+      const payload = initial ? value : { ...value, id: insightId };
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(value),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -70,23 +70,20 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
         return;
       }
 
-      if (!initial) {
-        const created = await res.json();
-        setInsightId(created.id);
-      }
-
       onDone();
     },
   });
 
+  const submitWith = (published: boolean) => {
+    form.setFieldValue("published", published);
+    if (!form.state.values.slug) {
+      form.setFieldValue("slug", slugify(form.state.values.title));
+    }
+    form.handleSubmit();
+  };
+
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      if (!form.state.values.slug) {
-        form.setFieldValue("slug", slugify(form.state.values.title));
-      }
-      form.handleSubmit();
-    }}>
+    <form onSubmit={(e) => { e.preventDefault(); submitWith(form.state.values.published ?? true); }}>
       <DialogHeader>
         <DialogTitle>{initial ? "Edit Insight" : "Add Insight"}</DialogTitle>
         <DialogDescription>
@@ -186,31 +183,21 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
           </form.Field>
         </FieldGroup>
 
-        <form.Field name="published">
-          {(f) => (
-            <Field orientation="horizontal">
-              <Checkbox id="ins-published" checked={f.state.value} onCheckedChange={(v) => f.handleChange(v === true)} />
-              <FieldLabel htmlFor="ins-published">Published</FieldLabel>
-            </Field>
-          )}
-        </form.Field>
-
-        {/* Photo uploader */}
-        {insightId && (
-          <PhotoUploader
-            entityType="insights"
-            entityId={insightId}
-            photos={photos}
-            onPhotosChange={setPhotos}
-          />
-        )}
-        {!insightId && (
-          <p className="text-xs text-muted-foreground">Save the insight first, then you can add photos.</p>
-        )}
+        <PhotoUploader
+          entityType="insights"
+          entityId={insightId}
+          photos={photos}
+          onPhotosChange={setPhotos}
+        />
       </FieldGroup>
 
-      <DialogFooter className="mt-4">
-        <Button type="submit" className="rounded-full">{initial ? "Update" : "Create"} Insight</Button>
+      <DialogFooter className="mt-4 gap-2">
+        <Button type="button" variant="outline" className="rounded-full" onClick={() => submitWith(false)}>
+          Save as Draft
+        </Button>
+        <Button type="button" className="rounded-full" onClick={() => submitWith(true)}>
+          Publish
+        </Button>
       </DialogFooter>
     </form>
   );
