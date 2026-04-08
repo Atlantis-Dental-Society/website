@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarDays, FileText, Settings, Users, Mail, BookOpen } from "lucide-react";
+import { CalendarDays, FileText, Settings, Users, Mail, BookOpen, Palette } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const sections = [
@@ -46,6 +46,13 @@ const sections = [
     href: "/admin/resources",
     icon: BookOpen,
     color: "bg-terracotta/10 text-terracotta",
+  },
+  {
+    label: "Design System",
+    description: "Colors, typography, shadows, and technical details",
+    href: "/admin/design",
+    icon: Palette,
+    color: "bg-primary/10 text-primary",
   },
 ];
 

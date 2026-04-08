@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, FileText, LayoutDashboard, LogOut, Menu, Settings, Users } from "lucide-react";
+import { CalendarDays, FileText, LayoutDashboard, LogOut, Menu, Palette, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -15,6 +15,7 @@ const navItems = [
   { label: "Events", href: "/admin/events", icon: CalendarDays },
   { label: "Insights", href: "/admin/insights", icon: FileText },
   { label: "Members", href: "/admin/members", icon: Users },
+  { label: "Design System", href: "/admin/design", icon: Palette },
   { label: "Content Editor", href: "/tina", icon: Settings },
 ];
 
