@@ -2,15 +2,19 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, FileText, LayoutDashboard, LogOut } from "lucide-react";
+import { CalendarDays, FileText, LayoutDashboard, LogOut, Menu, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 
 const navItems = [
+  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Events", href: "/admin/events", icon: CalendarDays },
   { label: "Insights", href: "/admin/insights", icon: FileText },
+  { label: "Members", href: "/admin/members", icon: Users },
+  { label: "Content Editor", href: "/tina", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -44,54 +48,125 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  const sidebarContent = (
+    <>
+      <nav className="space-y-1 flex-1">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Button
+              key={item.href}
+              asChild
+              variant={isActive ? "secondary" : "ghost"}
+              className={cn(
+                "w-full justify-start gap-2.5 rounded-lg",
+                isActive && "bg-primary/10 text-primary hover:bg-primary/15"
+              )}
+            >
+              <Link href={item.href}>
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            </Button>
+          );
+        })}
+      </nav>
+      <Separator className="my-4 bg-border/30" />
+      <div className="px-1">
+        <p className="mb-2 truncate px-2 text-xs text-muted-foreground">
+          {session?.user.email}
+        </p>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2.5 rounded-lg text-muted-foreground hover:text-destructive"
+          onClick={async () => {
+            await authClient.signOut();
+            router.push("/login");
+          }}
+        >
+          <LogOut className="h-4 w-4" />
+          Sign Out
+        </Button>
+      </div>
+    </>
+  );
+
   return (
     <div className="flex min-h-[calc(100vh-4.5rem)]">
-      <aside className="w-56 shrink-0 border-r border-border/30 bg-muted/30 p-4 flex flex-col">
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex w-56 shrink-0 border-r border-border/30 bg-muted/30 p-4 flex-col">
         <div className="flex items-center gap-2 px-3 py-2 mb-2">
           <LayoutDashboard className="h-5 w-5 text-primary" />
           <span className="font-bold text-sm">Admin Panel</span>
         </div>
         <Separator className="mb-4 bg-border/30" />
-        <nav className="space-y-1 flex-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Button
-                key={item.href}
-                asChild
-                variant={isActive ? "secondary" : "ghost"}
-                className={cn(
-                  "w-full justify-start gap-2.5 rounded-lg",
-                  isActive && "bg-primary/10 text-primary hover:bg-primary/15"
-                )}
-              >
-                <Link href={item.href}>
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              </Button>
-            );
-          })}
-        </nav>
-        <Separator className="my-4 bg-border/30" />
-        <div className="px-1">
-          <p className="mb-2 truncate px-2 text-xs text-muted-foreground">
-            {session?.user.email}
-          </p>
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-2.5 rounded-lg text-muted-foreground hover:text-destructive"
-            onClick={async () => {
-              await authClient.signOut();
-              router.push("/login");
-            }}
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </Button>
-        </div>
+        {sidebarContent}
       </aside>
-      <div className="flex-1">{children}</div>
+
+      {/* Mobile header + sheet */}
+      <div className="flex flex-1 flex-col">
+        <div className="flex items-center gap-3 border-b border-border/30 bg-muted/30 px-4 py-3 md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-lg" aria-label="Open menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-4">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2 text-sm">
+                  <LayoutDashboard className="h-5 w-5 text-primary" />
+                  Admin Panel
+                </SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 flex flex-col flex-1">
+                <nav className="space-y-1 flex-1">
+                  {navItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <SheetClose key={item.href} asChild>
+                        <Button
+                          asChild
+                          variant={isActive ? "secondary" : "ghost"}
+                          className={cn(
+                            "w-full justify-start gap-2.5 rounded-lg",
+                            isActive && "bg-primary/10 text-primary hover:bg-primary/15"
+                          )}
+                        >
+                          <Link href={item.href}>
+                            <item.icon className="h-4 w-4" />
+                            {item.label}
+                          </Link>
+                        </Button>
+                      </SheetClose>
+                    );
+                  })}
+                </nav>
+                <Separator className="my-4 bg-border/30" />
+                <div className="px-1">
+                  <p className="mb-2 truncate px-2 text-xs text-muted-foreground">
+                    {session?.user.email}
+                  </p>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2.5 rounded-lg text-muted-foreground hover:text-destructive"
+                    onClick={async () => {
+                      await authClient.signOut();
+                      router.push("/login");
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+          <span className="font-bold text-sm">Admin Panel</span>
+        </div>
+
+        <div className="flex-1">{children}</div>
+      </div>
     </div>
   );
 }

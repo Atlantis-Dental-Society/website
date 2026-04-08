@@ -104,26 +104,22 @@ export default async function HomePage() {
   );
 }
 
-/* ── Welcome Section: Centered gradient card ── */
+/* ── Welcome Section: Left-aligned, no card ── */
 function WelcomeSection({ section }: { section: Section }) {
   return (
-    <section className="py-24 sm:py-28">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <Card className="relative overflow-hidden rounded-[2rem] border-none ring-0 bg-gradient-to-br from-muted/60 via-card to-muted/40 shadow-warm-lg">
-          <CardContent className="relative p-10 sm:p-14 text-center">
-            <div className="absolute -top-16 -right-16 h-48 w-48 blob-shape-1 bg-primary/8 blur-3xl" />
-            <div className="absolute -bottom-16 -left-16 h-48 w-48 blob-shape-2 bg-sage/10 blur-3xl" />
-            <div className="relative">
-              <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                <Sparkles className="h-7 w-7 text-primary" />
-              </div>
-              <h2 className="text-3xl font-extrabold sm:text-4xl">{section.heading}</h2>
-              <p className="mt-6 text-muted-foreground leading-relaxed max-w-2xl mx-auto text-lg">
-                {section.body}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+    <section className="relative py-24 sm:py-28 overflow-hidden">
+      <div className="absolute -top-16 -right-16 h-48 w-48 blob-shape-1 bg-primary/8 blur-3xl" />
+      <div className="absolute -bottom-16 -left-16 h-48 w-48 blob-shape-2 bg-sage/10 blur-3xl" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+            <Sparkles className="h-5 w-5 text-primary" />
+          </div>
+          <h2 className="text-3xl font-extrabold sm:text-4xl">{section.heading}</h2>
+        </div>
+        <p className="mt-4 text-muted-foreground leading-relaxed max-w-2xl text-lg">
+          {section.body}
+        </p>
       </div>
     </section>
   );
@@ -151,7 +147,7 @@ function FeatureGridSection({
 
   return (
     <section className="relative py-24 sm:py-28 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-3">
           <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${c.bg}`}>
@@ -255,7 +251,7 @@ function EventsTeaserSection({
 }) {
   return (
     <section className="relative py-24 sm:py-28 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-muted/10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
@@ -379,7 +375,7 @@ function FallbackSection({
 }) {
   return (
     <section className={`py-24 sm:py-28 ${alt ? "relative overflow-hidden" : ""}`}>
-      {alt && <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-muted/10" />}
+      {alt && <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />}
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Card className="rounded-2xl border-none ring-0 shadow-warm max-w-3xl">
           <CardContent className="p-8">

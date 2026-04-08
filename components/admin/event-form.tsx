@@ -8,14 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 import { PhotoUploader, type Photo } from "@/components/admin/photo-uploader";
 
 export type Event = EventInput & { id: string; createdAt: string; updatedAt: string };
@@ -26,7 +25,6 @@ interface EventFormProps {
 }
 
 export function EventForm({ initial, onDone }: EventFormProps) {
-  const [error, setError] = useState("");
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [eventId, setEventId] = useState<string | null>(initial?.id ?? null);
 
@@ -57,7 +55,6 @@ export function EventForm({ initial, onDone }: EventFormProps) {
       onChange: eventSchema,
     },
     onSubmit: async ({ value }) => {
-      setError("");
       const url = initial ? `/api/events/${initial.id}` : "/api/events";
       const method = initial ? "PUT" : "POST";
       const res = await fetch(url, {
@@ -68,7 +65,7 @@ export function EventForm({ initial, onDone }: EventFormProps) {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Failed to save");
+        toast.error(data.error || "Failed to save");
         return;
       }
 
@@ -90,13 +87,6 @@ export function EventForm({ initial, onDone }: EventFormProps) {
           {initial ? "Update the event details below." : "Fill in the details to create a new event."}
         </DialogDescription>
       </DialogHeader>
-
-      {error && (
-        <Alert variant="destructive" className="mt-2 border-none">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
 
       <FieldGroup className="mt-4">
         <FieldGroup className="flex-row">

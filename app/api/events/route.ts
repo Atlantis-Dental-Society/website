@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { events } from "@/lib/schema";
 import { eventSchema } from "@/lib/validations";
+import { notifyNewEvent } from "@/lib/email-notifications";
 
 export async function GET() {
   try {
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
     }
 
     const [created] = await db.insert(events).values(result.data).returning();
+    if (created.published !== false) notifyNewEvent(created);
     return NextResponse.json(created, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

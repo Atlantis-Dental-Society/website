@@ -30,29 +30,22 @@ export default async function PartnerPage() {
         }
       />
 
-      {/* Text sections as highlight cards */}
+      {/* Text sections as left-aligned intro blocks */}
       {textSections.length > 0 && (
-        <section className="-mt-4 pb-16">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 sm:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {textSections.map((section) => (
-              <Card
-                key={section.id}
-                className="relative overflow-hidden rounded-[2rem] border-none ring-0 bg-gradient-to-br from-sage/8 via-card to-primary/5 shadow-warm-lg"
-              >
-                <CardContent className="relative p-10 sm:p-12">
-                  <div className="absolute -top-10 -right-10 h-36 w-36 blob-shape-1 bg-sage/10 blur-3xl" />
-                  <div className="absolute -bottom-10 -left-10 h-36 w-36 blob-shape-2 bg-primary/8 blur-3xl" />
-                  <div className="relative">
-                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sage/15">
-                      <Handshake className="h-6 w-6 text-sage" />
-                    </div>
-                    <h2 className="text-2xl font-extrabold sm:text-3xl">{section.heading}</h2>
-                    <p className="mt-4 text-muted-foreground leading-relaxed text-lg max-w-2xl">
-                      {section.body}
-                    </p>
+              <div key={section.id}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sage/15">
+                    <Handshake className="h-5 w-5 text-sage" />
                   </div>
-                </CardContent>
-              </Card>
+                  <h2 className="text-3xl font-extrabold sm:text-4xl">{section.heading}</h2>
+                </div>
+                <p className="mt-4 text-muted-foreground leading-relaxed text-lg max-w-2xl">
+                  {section.body}
+                </p>
+              </div>
             ))}
           </div>
         </section>
@@ -63,7 +56,7 @@ export default async function PartnerPage() {
         const items = (section.items ?? []).filter((i): i is NonNullable<typeof i> => !!i);
         return (
           <section key={section.id} className="relative py-24 sm:py-28 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />
             <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="max-w-2xl mb-10">
                 <h2 className="text-3xl font-extrabold sm:text-4xl">{section.heading}</h2>

@@ -14,6 +14,7 @@ export const user = pgTable("user", {
     .notNull(),
   phone: text("phone").notNull(),
   role: text("role").default("user"),
+  emailNotifications: boolean("email_notifications").default(true),
 });
 
 export const session = pgTable(

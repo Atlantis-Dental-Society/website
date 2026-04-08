@@ -15,8 +15,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/admin",
-        destination: "/admin/index.html",
+        source: "/tina",
+        destination: "/tina-admin/index.html",
       },
     ];
   },

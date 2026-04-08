@@ -5,13 +5,13 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod/v4";
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Leaf, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Leaf, Eye, EyeOff, Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -32,7 +32,6 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/admin";
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -45,7 +44,6 @@ function LoginForm() {
       onSubmit: loginSchema,
     },
     onSubmit: async ({ value }) => {
-      setError("");
       setSubmitting(true);
       try {
         const { error: authError } = await authClient.signIn.email({
@@ -54,13 +52,13 @@ function LoginForm() {
         });
 
         if (authError) {
-          setError(authError.message ?? "Invalid email or password");
+          toast.error(authError.message ?? "Invalid email or password");
           return;
         }
 
         router.push(callbackUrl);
       } catch {
-        setError("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       } finally {
         setSubmitting(false);
       }
@@ -85,13 +83,6 @@ function LoginForm() {
               Sign in to your account
             </p>
           </div>
-
-          {error && (
-            <Alert variant="destructive" className="mb-6 rounded-2xl border-none bg-destructive/10">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
 
           <form
             className="space-y-4"
@@ -155,6 +146,12 @@ function LoginForm() {
                 );
               }}
             </form.Field>
+
+            <div className="flex justify-end">
+              <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary hover:underline">
+                Forgot password?
+              </Link>
+            </div>
 
             <Button
               type="submit"

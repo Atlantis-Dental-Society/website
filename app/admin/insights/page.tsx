@@ -27,7 +27,7 @@ export default function AdminInsightsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+    <div className="mx-auto max-w-5xl p-6 sm:p-8 lg:p-10">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-extrabold">Manage Insights</h1>
         <Button className="rounded-full gap-2" onClick={() => { setEditing(null); setOpen(true); }}>

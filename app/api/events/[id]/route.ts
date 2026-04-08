@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { events } from "@/lib/schema";
 import { eventSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
+import { notifyNewEvent } from "@/lib/email-notifications";
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -28,6 +29,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       );
     }
 
+    const [existing] = await db.select({ published: events.published }).from(events).where(eq(events.id, id));
+    const wasDraft = existing && existing.published === false;
+
     const [updated] = await db
       .update(events)
       .set({ ...result.data, updatedAt: new Date() })
@@ -35,6 +39,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       .returning();
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (wasDraft && updated.published !== false) notifyNewEvent(updated);
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

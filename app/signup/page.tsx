@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod/v4";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Leaf, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Leaf, Eye, EyeOff, Loader2 } from "lucide-react";
 
 const signupSchema = z
   .object({
@@ -36,7 +36,6 @@ type SignupInput = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
   const router = useRouter();
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -53,7 +52,6 @@ export default function SignupPage() {
       onSubmit: signupSchema,
     },
     onSubmit: async ({ value }) => {
-      setError("");
       setSubmitting(true);
       try {
         const { error: authError } = await authClient.signUp.email({
@@ -64,13 +62,13 @@ export default function SignupPage() {
         });
 
         if (authError) {
-          setError(authError.message ?? "Something went wrong");
+          toast.error(authError.message ?? "Something went wrong");
           return;
         }
 
         router.push("/admin");
       } catch {
-        setError("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       } finally {
         setSubmitting(false);
       }
@@ -95,13 +93,6 @@ export default function SignupPage() {
               Join Atlantis Dental Society
             </p>
           </div>
-
-          {error && (
-            <Alert variant="destructive" className="mb-6 rounded-2xl border-none bg-destructive/10">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
 
           <form
             className="space-y-4"

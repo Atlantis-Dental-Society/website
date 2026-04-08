@@ -8,14 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 import { slugify } from "@/lib/utils";
 import { PhotoUploader, type Photo } from "@/components/admin/photo-uploader";
 
@@ -27,7 +26,6 @@ interface InsightFormProps {
 }
 
 export function InsightForm({ initial, onDone }: InsightFormProps) {
-  const [error, setError] = useState("");
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [insightId, setInsightId] = useState<string | null>(initial?.id ?? null);
 
@@ -58,7 +56,6 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
       onChange: insightSchema,
     },
     onSubmit: async ({ value }) => {
-      setError("");
       const url = initial ? `/api/insights/${initial.id}` : "/api/insights";
       const method = initial ? "PUT" : "POST";
       const res = await fetch(url, {
@@ -69,7 +66,7 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
 
       if (!res.ok) {
         const d = await res.json();
-        setError(d.error || "Failed to save");
+        toast.error(d.error || "Failed to save");
         return;
       }
 
@@ -96,13 +93,6 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
           {initial ? "Update the insight details below." : "Fill in the details to create a new insight post."}
         </DialogDescription>
       </DialogHeader>
-
-      {error && (
-        <Alert variant="destructive" className="mt-2 border-none">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
 
       <FieldGroup className="mt-4">
         <FieldGroup className="flex-row">

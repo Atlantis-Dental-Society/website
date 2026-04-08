@@ -1,7 +1,7 @@
 import { getPageContent } from "@/lib/tina";
 import { db } from "@/lib/db";
-import { insights } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { insights, photos } from "@/lib/schema";
+import { eq, and, inArray } from "drizzle-orm";
 import { BookOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHero } from "@/components/page-hero";
@@ -16,6 +16,22 @@ export default async function InsightsPage() {
     .from(insights)
     .where(eq(insights.published, true))
     .orderBy(insights.publishedDate);
+
+  const insightIds = allInsights.map((i) => i.id);
+  const allPhotos = insightIds.length > 0
+    ? await db
+        .select()
+        .from(photos)
+        .where(and(eq(photos.entityType, "insights"), inArray(photos.entityId, insightIds)))
+        .orderBy(photos.order)
+    : [];
+
+  const firstPhotoByInsight = new Map<string, string>();
+  for (const photo of allPhotos) {
+    if (!firstPhotoByInsight.has(photo.entityId)) {
+      firstPhotoByInsight.set(photo.entityId, photo.url);
+    }
+  }
 
   return (
     <>
@@ -46,7 +62,7 @@ export default async function InsightsPage() {
           ) : (
             <div className="grid gap-8 sm:grid-cols-2">
               {allInsights.map((post) => (
-                <InsightCard key={post.slug} post={post} />
+                <InsightCard key={post.slug} post={post} bannerUrl={firstPhotoByInsight.get(post.id) ?? post.coverImageUrl ?? undefined} />
               ))}
             </div>
           )}

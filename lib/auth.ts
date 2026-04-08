@@ -13,6 +13,17 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
     maxPasswordLength: 128,
+    sendResetPassword: async ({ user, url }) => {
+      const { sendEmail } = await import("./ses");
+      const { buildPasswordResetEmail } = await import("./email-templates");
+      const email = buildPasswordResetEmail(url, user.name);
+      await sendEmail({
+        to: user.email,
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+      });
+    },
   },
   user: {
     additionalFields: {
@@ -25,6 +36,12 @@ export const auth = betterAuth({
         type: "string",
         required: false,
         defaultValue: "user",
+        input: false,
+      },
+      emailNotifications: {
+        type: "boolean",
+        required: false,
+        defaultValue: true,
         input: false,
       },
     },

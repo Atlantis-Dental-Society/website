@@ -5,7 +5,7 @@ export default defineConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID || "",
   token: process.env.TINA_TOKEN || "",
   build: {
-    outputFolder: "admin",
+    outputFolder: "tina-admin",
     publicFolder: "public",
   },
   media: {
@@ -32,6 +32,8 @@ export default defineConfig({
         fields: [
           { type: "string", name: "name", label: "Site Name", required: true },
           { type: "string", name: "tagline", label: "Tagline" },
+          { type: "image", name: "logo", label: "Logo" },
+          { type: "image", name: "favicon", label: "Favicon" },
           { type: "string", name: "email", label: "Email" },
           { type: "string", name: "instagramUrl", label: "Instagram URL" },
           { type: "string", name: "instagramHandle", label: "Instagram Handle" },

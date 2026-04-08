@@ -14,13 +14,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Send, CheckCircle, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+import { Send, CheckCircle } from "lucide-react";
 import { useState } from "react";
 
 export function JoinForm() {
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "success">("idle");
 
   const form = useForm({
     defaultValues: {
@@ -37,7 +36,6 @@ export function JoinForm() {
       onChange: joinSubmissionSchema,
     },
     onSubmit: async ({ value }) => {
-      setErrorMessage("");
       try {
         const res = await fetch("/api/join", {
           method: "POST",
@@ -51,9 +49,9 @@ export function JoinForm() {
         }
 
         setStatus("success");
+        toast.success("Application submitted successfully!");
       } catch (err) {
-        setStatus("error");
-        setErrorMessage(err instanceof Error ? err.message : "Something went wrong");
+        toast.error(err instanceof Error ? err.message : "Something went wrong");
       }
     },
   });
@@ -79,13 +77,6 @@ export function JoinForm() {
       <CardContent className="p-8 sm:p-10">
         <h2 className="text-2xl font-extrabold">Application Form</h2>
         <p className="mt-2 text-sm text-muted-foreground">Fill out the form below and we&apos;ll get back to you.</p>
-
-        {status === "error" && (
-          <Alert variant="destructive" className="mt-4 rounded-2xl bg-red-500/10 border-none">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        )}
 
         <form
           className="mt-8 space-y-5"

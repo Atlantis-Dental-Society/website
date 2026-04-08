@@ -1,5 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
+import * as ses from "aws-cdk-lib/aws-ses";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import { Construct } from "constructs";
@@ -44,6 +45,15 @@ export class AdsMediaStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, "BucketName", {
       value: mediaBucket.bucketName,
+    });
+
+    // SES domain identity for sending notifications
+    const emailIdentity = new ses.EmailIdentity(this, "AdsEmailIdentity", {
+      identity: ses.Identity.domain("atlantisdentalsociety.ca"),
+    });
+
+    new cdk.CfnOutput(this, "SesIdentityName", {
+      value: emailIdentity.emailIdentityName,
     });
   }
 }
