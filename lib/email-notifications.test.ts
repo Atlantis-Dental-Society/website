@@ -16,7 +16,7 @@ vi.mock("./db", () => ({
 }));
 
 vi.mock("./auth-schema", () => ({
-  user: { emailNotifications: "email_notifications" },
+  user: { emailNotifications: "email_notifications", role: "role" },
 }));
 
 import { notifyNewEvent, notifyNewInsight } from "./email-notifications";
@@ -62,7 +62,7 @@ describe("notifyNewEvent", () => {
     mockSendEmail.mockClear();
   });
 
-  it("sends emails to all subscribed users", async () => {
+  it("sends emails to all subscribed admin users", async () => {
     notifyNewEvent(mockEvent);
     // Wait for the fire-and-forget async to complete
     await new Promise((r) => setTimeout(r, 50));
@@ -102,7 +102,7 @@ describe("notifyNewInsight", () => {
     mockSendEmail.mockClear();
   });
 
-  it("sends emails to all subscribed users", async () => {
+  it("sends emails to all subscribed admin users", async () => {
     notifyNewInsight(mockInsight);
     await new Promise((r) => setTimeout(r, 50));
 

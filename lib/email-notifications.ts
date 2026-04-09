@@ -1,15 +1,18 @@
 import { db } from "./db";
 import { user } from "./auth-schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { sendEmail } from "./ses";
 import { buildNewEventEmail, buildNewInsightEmail } from "./email-templates";
 import type { events, insights } from "./schema";
 
+// Only admins currently receive new-content notifications. This is a
+// temporary scoping while the site is in testing — broaden to all
+// subscribed users once content review is formalized.
 async function getSubscribedEmails() {
   return db
     .select({ email: user.email, name: user.name })
     .from(user)
-    .where(eq(user.emailNotifications, true));
+    .where(and(eq(user.emailNotifications, true), eq(user.role, "admin")));
 }
 
 function notifySubscribers(
