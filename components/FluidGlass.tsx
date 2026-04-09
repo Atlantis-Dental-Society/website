@@ -58,10 +58,12 @@ export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {
       <ScrollControls damping={0.2} pages={pages} distance={0.4}>
         {mode === 'bar' && <NavItems items={navItems as NavItem[]} />}
         <Wrapper modeProps={modeProps}>
-          <Scroll>
-            <Typography />
-            <Images />
-          </Scroll>
+          {!children && (
+            <Scroll>
+              <Typography />
+              <Images />
+            </Scroll>
+          )}
           {children && <Scroll html>{children}</Scroll>}
           <Preload />
         </Wrapper>

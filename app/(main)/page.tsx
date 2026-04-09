@@ -147,7 +147,7 @@ function FeatureGridSection({
 
   return (
     <section className="relative py-24 sm:py-28 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/10 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-3">
           <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${c.bg}`}>
@@ -251,7 +251,7 @@ function EventsTeaserSection({
 }) {
   return (
     <section className="relative py-24 sm:py-28 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/10 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
@@ -375,7 +375,7 @@ function FallbackSection({
 }) {
   return (
     <section className={`py-24 sm:py-28 ${alt ? "relative overflow-hidden" : ""}`}>
-      {alt && <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />}
+      {alt && <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/10 to-transparent" />}
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Card className="rounded-2xl border-none ring-0 shadow-warm max-w-3xl">
           <CardContent className="p-8">
