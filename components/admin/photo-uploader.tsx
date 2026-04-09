@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ImagePlus, X, GripVertical, Loader2 } from "lucide-react";
@@ -9,7 +10,15 @@ export interface Photo {
   id: string;
   url: string;
   key: string;
-  order: string;
+  order: string | number;
+}
+
+async function extractError(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = await res.json();
+    if (data?.error) return data.error;
+  } catch { /* not json */ }
+  return `${fallback} (${res.status})`;
 }
 
 interface PhotoUploaderProps {
@@ -31,9 +40,14 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
 
     setUploading(true);
     const newPhotos: Photo[] = [];
+    let failures = 0;
 
     for (const file of imageFiles) {
       try {
+        if (!file.type) {
+          throw new Error(`${file.name}: unknown file type`);
+        }
+
         const res = await fetch("/api/upload", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -45,14 +59,20 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
           }),
         });
 
-        if (!res.ok) continue;
+        if (!res.ok) {
+          throw new Error(await extractError(res, "Failed to get upload URL"));
+        }
         const { presignedUrl, publicUrl, key } = await res.json();
 
-        await fetch(presignedUrl, {
+        const s3Res = await fetch(presignedUrl, {
           method: "PUT",
           headers: { "Content-Type": file.type },
           body: file,
         });
+
+        if (!s3Res.ok) {
+          throw new Error(`S3 upload failed (${s3Res.status})`);
+        }
 
         const photoRes = await fetch("/api/photos", {
           method: "POST",
@@ -66,17 +86,23 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
           }),
         });
 
-        if (photoRes.ok) {
-          const photo = await photoRes.json();
-          newPhotos.push(photo);
+        if (!photoRes.ok) {
+          throw new Error(await extractError(photoRes, "Failed to save photo"));
         }
-      } catch {
-        // skip failed uploads silently
+
+        newPhotos.push(await photoRes.json());
+      } catch (err) {
+        failures++;
+        const msg = err instanceof Error ? err.message : "Upload failed";
+        toast.error(`${file.name}: ${msg}`);
       }
     }
 
     if (newPhotos.length > 0) {
       onPhotosChange([...photos, ...newPhotos]);
+      if (failures === 0) {
+        toast.success(`Uploaded ${newPhotos.length} photo${newPhotos.length === 1 ? "" : "s"}`);
+      }
     }
     setUploading(false);
   }, [entityType, entityId, photos, onPhotosChange]);
