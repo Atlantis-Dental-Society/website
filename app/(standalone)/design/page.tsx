@@ -129,15 +129,9 @@ export default function DesignSystemPage() {
   }
 
   return (
-    <div className="bg-[#0f0a1e]">
-      {/* FluidGlass hero — full viewport */}
-      <div className="h-svh w-full">
-        <FluidGlass mode="lens" />
-      </div>
-
-      {/* Design system content below */}
-      <div className="relative bg-gradient-to-b from-[#0f0a1e] via-[#1a0a2e] to-[#0f0a1e]">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 space-y-14">
+    <div className="h-svh w-full">
+      <FluidGlass mode="lens" pages={8}>
+        <div className="mx-auto max-w-5xl px-4 pt-[110vh] pb-20 sm:px-6 lg:px-8 space-y-14">
 
           {/* Brand Identity */}
           <section>
@@ -363,7 +357,7 @@ export default function DesignSystemPage() {
           </section>
 
         </div>
-      </div>
+      </FluidGlass>
     </div>
   );
 }

@@ -28,9 +28,11 @@ interface FluidGlassProps {
   lensProps?: ModeProps;
   barProps?: ModeProps;
   cubeProps?: ModeProps;
+  pages?: number;
+  children?: ReactNode;
 }
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {} }: FluidGlassProps) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {}, pages = 3, children }: FluidGlassProps) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
 
@@ -53,13 +55,14 @@ export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {
         canvas.addEventListener('webglcontextrestored', () => gl.forceContextRestore?.());
       }}
     >
-      <ScrollControls damping={0.2} pages={3} distance={0.4}>
+      <ScrollControls damping={0.2} pages={pages} distance={0.4}>
         {mode === 'bar' && <NavItems items={navItems as NavItem[]} />}
         <Wrapper modeProps={modeProps}>
           <Scroll>
             <Typography />
             <Images />
           </Scroll>
+          {children && <Scroll html>{children}</Scroll>}
           <Preload />
         </Wrapper>
       </ScrollControls>
