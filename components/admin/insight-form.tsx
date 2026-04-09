@@ -219,7 +219,7 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
 
       <DialogFooter className="mt-4 gap-2">
         <Button type="button" variant="outline" className="rounded-full" onClick={() => submitWith(false)}>
-          Save as Draft
+          {initial?.published ? "Unpublish" : "Save as Draft"}
         </Button>
         <Button type="button" className="rounded-full" onClick={() => submitWith(true)}>
           Publish
