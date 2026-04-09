@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { photos } from "@/lib/schema";
 import { eq, and } from "drizzle-orm";
+import { requireAdmin } from "@/lib/require-admin";
 
 export async function GET(request: Request) {
   try {
@@ -30,6 +31,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const { error: authError } = await requireAdmin();
+    if (authError) return authError;
+
     const { entityType, entityId, url, key, order } = await request.json();
 
     if (!entityType || !entityId || !url || !key) {
@@ -41,7 +45,7 @@ export async function POST(request: Request) {
 
     const [created] = await db
       .insert(photos)
-      .values({ entityType, entityId, url, key, order: order ?? "0" })
+      .values({ entityType, entityId, url, key, order: order != null ? Number(order) : 0 })
       .returning();
 
     return NextResponse.json(created, { status: 201 });

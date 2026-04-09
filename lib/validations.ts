@@ -24,7 +24,7 @@ export const eventSchema = z.object({
 export const insightSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, "Title is required"),
-  slug: z.string().min(1, "Slug is required"),
+  slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase alphanumeric with hyphens"),
   excerpt: optionalStr,
   body: optionalStr,
   author: optionalStr,

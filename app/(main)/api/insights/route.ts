@@ -3,11 +3,14 @@ import { db } from "@/lib/db";
 import { insights } from "@/lib/schema";
 import { insightSchema } from "@/lib/validations";
 import { notifyNewInsight } from "@/lib/email-notifications";
+import { requireAdmin } from "@/lib/require-admin";
 
 export async function GET() {
   try {
     const allInsights = await db.select().from(insights).orderBy(insights.publishedDate);
-    return NextResponse.json(allInsights);
+    return NextResponse.json(allInsights, {
+      headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
+    });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
@@ -15,6 +18,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const { error: authError } = await requireAdmin();
+    if (authError) return authError;
+
     const body = await request.json();
     const result = insightSchema.safeParse(body);
 

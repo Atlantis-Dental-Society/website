@@ -29,13 +29,15 @@ const sectionIcons: Record<string, React.ElementType> = {
 };
 
 export default async function HomePage() {
-  const page = await getPageContent("home");
-  const upcomingEvents = await db
-    .select()
-    .from(events)
-    .where(eq(events.published, true))
-    .orderBy(events.date)
-    .limit(3);
+  const [page, upcomingEvents] = await Promise.all([
+    getPageContent("home"),
+    db
+      .select()
+      .from(events)
+      .where(eq(events.published, true))
+      .orderBy(events.date)
+      .limit(3),
+  ]);
 
   const hero = page?.hero;
   const sections = getSections(page);
@@ -109,7 +111,7 @@ function WelcomeSection({ section }: { section: Section }) {
   return (
     <section className="relative py-24 sm:py-28 overflow-hidden">
       <div className="absolute -top-16 -right-16 h-48 w-48 blob-shape-1 bg-primary/8 blur-3xl" />
-      <div className="absolute -bottom-16 -left-16 h-48 w-48 blob-shape-2 bg-sage/10 blur-3xl" />
+      <div className="absolute bottom-26 left-100 h-48 w-48 blob-shape-2 bg-sage/10 blur-3xl" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">

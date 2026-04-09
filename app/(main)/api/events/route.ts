@@ -3,11 +3,14 @@ import { db } from "@/lib/db";
 import { events } from "@/lib/schema";
 import { eventSchema } from "@/lib/validations";
 import { notifyNewEvent } from "@/lib/email-notifications";
+import { requireAdmin } from "@/lib/require-admin";
 
 export async function GET() {
   try {
     const allEvents = await db.select().from(events).orderBy(events.date);
-    return NextResponse.json(allEvents);
+    return NextResponse.json(allEvents, {
+      headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
+    });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
@@ -15,6 +18,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const { error: authError } = await requireAdmin();
+    if (authError) return authError;
+
     const body = await request.json();
     const result = eventSchema.safeParse(body);
 

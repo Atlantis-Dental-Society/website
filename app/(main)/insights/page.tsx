@@ -8,14 +8,15 @@ import { PageHero } from "@/components/page-hero";
 import { InsightCard } from "@/components/insight-card";
 
 export default async function InsightsPage() {
-  const page = await getPageContent("insights");
+  const [page, allInsights] = await Promise.all([
+    getPageContent("insights"),
+    db
+      .select()
+      .from(insights)
+      .where(eq(insights.published, true))
+      .orderBy(insights.publishedDate),
+  ]);
   const hero = page?.hero;
-
-  const allInsights = await db
-    .select()
-    .from(insights)
-    .where(eq(insights.published, true))
-    .orderBy(insights.publishedDate);
 
   const insightIds = allInsights.map((i) => i.id);
   const allPhotos = insightIds.length > 0

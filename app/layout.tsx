@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -6,14 +6,49 @@ import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/tina";
 
-const nunito = Nunito({ subsets: ["latin"], variable: "--font-sans", weight: ["300", "400", "500", "600", "700", "800"] });
+const SITE_URL = "https://atlantisdentalsociety.ca";
+
+const nunito = Nunito({ subsets: ["latin"], variable: "--font-sans" });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FAF5ED" },
+    { media: "(prefers-color-scheme: dark)", color: "#1A1612" },
+  ],
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getSiteConfig();
+  const siteName = config?.name || "Atlantis Dental Society";
+  const description = config?.tagline || "Everything pre-dental, all in one place.";
+
   return {
-    title: config?.name || "Atlantis Dental Society",
-    description: config?.tagline || "Everything pre-dental, all in one place.",
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
+    },
+    description,
     icons: { icon: config?.favicon || "/logo.png" },
+    openGraph: {
+      type: "website",
+      siteName,
+      title: siteName,
+      description,
+      url: SITE_URL,
+      images: [{ url: "/logo.png", width: 512, height: 512, alt: siteName }],
+    },
+    twitter: {
+      card: "summary",
+      title: siteName,
+      description,
+      images: ["/logo.png"],
+    },
+    alternates: {
+      canonical: SITE_URL,
+    },
   };
 }
 

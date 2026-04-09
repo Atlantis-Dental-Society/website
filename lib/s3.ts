@@ -38,7 +38,10 @@ export function getPublicUrl(key: string) {
 }
 
 export function buildS3Key(entityType: "events" | "insights", entityId: string, filename: string) {
-  const ext = filename.includes(".") ? filename.split(".").pop() : "jpg";
-  const uuid = crypto.randomUUID();
-  return `${entityType}/${entityId}/${uuid}.${ext}`;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(entityId)) {
+    throw new Error("Invalid entityId");
+  }
+  const ext = (filename.includes(".") ? filename.split(".").pop() : "jpg")?.replace(/[^a-zA-Z0-9]/g, "") || "jpg";
+  const id = crypto.randomUUID();
+  return `${entityType}/${entityId}/${id}.${ext}`;
 }

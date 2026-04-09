@@ -8,16 +8,17 @@ import { PageHero } from "@/components/page-hero";
 import { EventCard } from "@/components/event-card";
 
 export default async function EventsPage() {
-  const page = await getPageContent("events");
-  const hero = page?.hero;
-
   const today = new Date().toISOString().split("T")[0];
 
-  const allEvents = await db
-    .select()
-    .from(events)
-    .where(eq(events.published, true))
-    .orderBy(events.date);
+  const [page, allEvents] = await Promise.all([
+    getPageContent("events"),
+    db
+      .select()
+      .from(events)
+      .where(eq(events.published, true))
+      .orderBy(events.date),
+  ]);
+  const hero = page?.hero;
 
   const upcoming = allEvents.filter((e) => e.date >= today);
   const past = allEvents.filter((e) => e.date < today);

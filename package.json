@@ -1,5 +1,5 @@
 {
-  "name": "var-1",
+  "name": "atlantis-dental-society",
   "version": "0.0.1",
   "type": "module",
   "private": true,
@@ -28,7 +28,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
     "libphonenumber-js": "^1.12.40",
     "lucide-react": "^0.577.0",
@@ -38,7 +37,6 @@
     "react": "^19.2.4",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.4",
-    "shadcn": "^4.0.8",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tinacms": "^3.6.1",
@@ -60,7 +58,8 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "vite": "^8.0.1",
+    "dotenv": "^17.3.1",
+    "shadcn": "^4.0.8",
     "vitest": "^4.1.0"
   },
   "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd"

@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean, date } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean, date, index, integer } from "drizzle-orm/pg-core";
 
 export { user, session, account, verification, userRelations, sessionRelations, accountRelations } from "./auth-schema";
 
@@ -16,7 +16,10 @@ export const events = pgTable("events", {
   published: boolean("published").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [
+  index("events_published_date_idx").on(table.published, table.date),
+  index("events_featured_idx").on(table.featured),
+]);
 
 export const insights = pgTable("insights", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -32,7 +35,9 @@ export const insights = pgTable("insights", {
   publishedDate: date("published_date"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => [
+  index("insights_published_date_idx").on(table.published, table.publishedDate),
+]);
 
 export const photos = pgTable("photos", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -40,9 +45,11 @@ export const photos = pgTable("photos", {
   entityId: uuid("entity_id").notNull(),
   url: text("url").notNull(),
   key: text("key").notNull(),
-  order: text("sort_order").default("0"),
+  order: integer("sort_order").default(0),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  index("photos_entity_idx").on(table.entityType, table.entityId),
+]);
 
 export const joinSubmissions = pgTable("join_submissions", {
   id: uuid("id").defaultRandom().primaryKey(),

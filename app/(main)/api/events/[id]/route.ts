@@ -4,6 +4,7 @@ import { events } from "@/lib/schema";
 import { eventSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
 import { notifyNewEvent } from "@/lib/email-notifications";
+import { requireAdmin } from "@/lib/require-admin";
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -18,6 +19,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { error: authError } = await requireAdmin();
+    if (authError) return authError;
+
     const { id } = await params;
     const body = await request.json();
     const result = eventSchema.safeParse(body);
@@ -48,6 +52,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { error: authError } = await requireAdmin();
+    if (authError) return authError;
+
     const { id } = await params;
     const [deleted] = await db.delete(events).where(eq(events.id, id)).returning();
     if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });

@@ -3,9 +3,13 @@ import { db } from "@/lib/db";
 import { photos } from "@/lib/schema";
 import { deleteS3Object } from "@/lib/s3";
 import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/require-admin";
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { error: authError } = await requireAdmin();
+    if (authError) return authError;
+
     const { id } = await params;
     const [photo] = await db.select().from(photos).where(eq(photos.id, id));
 

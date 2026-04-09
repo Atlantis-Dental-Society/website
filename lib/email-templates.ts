@@ -1,4 +1,5 @@
 import type { events, insights } from "./schema";
+import { escapeHtml } from "./escape-html";
 
 const baseUrl = process.env.BETTER_AUTH_URL || "https://atlantisdentalsociety.ca";
 
@@ -51,9 +52,9 @@ export function buildNewEventEmail(event: typeof events.$inferSelect) {
 
   const html = wrapHtml(`
     <p style="margin:0;font-size:13px;font-weight:600;color:#D4AF37;text-transform:uppercase;letter-spacing:0.05em;">New Event</p>
-    <h1 style="margin:8px 0 0 0;font-size:24px;font-weight:800;color:#2D2419;line-height:1.3;">${event.title}</h1>
-    ${details ? `<p style="margin:12px 0 0 0;font-size:14px;color:#7B916F;font-weight:600;">${details}</p>` : ""}
-    ${event.description ? `<p style="margin:16px 0 0 0;font-size:15px;color:#5C5147;line-height:1.6;">${event.description}</p>` : ""}
+    <h1 style="margin:8px 0 0 0;font-size:24px;font-weight:800;color:#2D2419;line-height:1.3;">${escapeHtml(event.title)}</h1>
+    ${details ? `<p style="margin:12px 0 0 0;font-size:14px;color:#7B916F;font-weight:600;">${escapeHtml(details)}</p>` : ""}
+    ${event.description ? `<p style="margin:16px 0 0 0;font-size:15px;color:#5C5147;line-height:1.6;">${escapeHtml(event.description)}</p>` : ""}
     ${ctaButton("View Event", `${baseUrl}/events`)}
   `);
 
@@ -70,10 +71,10 @@ export function buildNewEventEmail(event: typeof events.$inferSelect) {
 export function buildNewInsightEmail(insight: typeof insights.$inferSelect) {
   const html = wrapHtml(`
     <p style="margin:0;font-size:13px;font-weight:600;color:#D4AF37;text-transform:uppercase;letter-spacing:0.05em;">New Insight</p>
-    <h1 style="margin:8px 0 0 0;font-size:24px;font-weight:800;color:#2D2419;line-height:1.3;">${insight.title}</h1>
-    ${insight.author ? `<p style="margin:12px 0 0 0;font-size:14px;color:#7B916F;">By ${insight.author}</p>` : ""}
-    ${insight.excerpt ? `<p style="margin:16px 0 0 0;font-size:15px;color:#5C5147;line-height:1.6;">${insight.excerpt}</p>` : ""}
-    ${ctaButton("Read More", `${baseUrl}/insights/${insight.slug}`)}
+    <h1 style="margin:8px 0 0 0;font-size:24px;font-weight:800;color:#2D2419;line-height:1.3;">${escapeHtml(insight.title)}</h1>
+    ${insight.author ? `<p style="margin:12px 0 0 0;font-size:14px;color:#7B916F;">By ${escapeHtml(insight.author)}</p>` : ""}
+    ${insight.excerpt ? `<p style="margin:16px 0 0 0;font-size:15px;color:#5C5147;line-height:1.6;">${escapeHtml(insight.excerpt)}</p>` : ""}
+    ${ctaButton("Read More", `${baseUrl}/insights/${escapeHtml(insight.slug)}`)}
   `);
 
   const text = [
@@ -90,7 +91,7 @@ export function buildPasswordResetEmail(url: string, userName?: string | null) {
   const greeting = userName ? `Hi ${userName},` : "Hi,";
 
   const html = wrapHtml(`
-    <h1 style="margin:0;font-size:24px;font-weight:800;color:#2D2419;">${greeting}</h1>
+    <h1 style="margin:0;font-size:24px;font-weight:800;color:#2D2419;">${escapeHtml(greeting)}</h1>
     <p style="margin:16px 0 0 0;font-size:15px;color:#5C5147;line-height:1.6;">We received a request to reset your password. Click the button below to choose a new one.</p>
     ${ctaButton("Reset Password", url)}
     <p style="margin:24px 0 0 0;font-size:13px;color:#9C8B7A;line-height:1.5;">This link expires in 1 hour. If you didn't request a password reset, you can safely ignore this email.</p>
