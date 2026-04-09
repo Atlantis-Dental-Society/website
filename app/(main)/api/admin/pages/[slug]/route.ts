@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { pageContent } from "@/lib/schema";
 import { pageContentSchema } from "@/lib/validations";
@@ -39,6 +40,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
       .returning();
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    revalidatePath(`/${slug === "home" ? "" : slug}`);
+
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
