@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { toast } from "sonner";
 
 export interface SavedPhoto {
   kind: "saved";
@@ -40,6 +41,18 @@ function cleanupKey(key: string) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ key }),
   }).catch(() => {});
+}
+
+// Pull an error message off a JSON response, falling back to a readable
+// default with the status code when the server returned a non-JSON body.
+async function extractError(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = await res.json();
+    if (data?.error) return data.error;
+  } catch {
+    /* not json */
+  }
+  return `${fallback} (${res.status})`;
 }
 
 export function usePhotoStaging({ entityType, entityId, initialId }: UsePhotoStagingOptions) {
@@ -90,9 +103,14 @@ export function usePhotoStaging({ entityType, entityId, initialId }: UsePhotoSta
 
       setUploading(true);
       const newStaged: StagedPhoto[] = [];
+      let failures = 0;
 
       for (const file of imageFiles) {
         try {
+          if (!file.type) {
+            throw new Error(`${file.name}: unknown file type`);
+          }
+
           const res = await fetch("/api/upload", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -103,7 +121,9 @@ export function usePhotoStaging({ entityType, entityId, initialId }: UsePhotoSta
               entityId,
             }),
           });
-          if (!res.ok) continue;
+          if (!res.ok) {
+            throw new Error(await extractError(res, "Failed to get upload URL"));
+          }
           const { presignedUrl, publicUrl, key } = await res.json();
 
           const putRes = await fetch(presignedUrl, {
@@ -111,7 +131,9 @@ export function usePhotoStaging({ entityType, entityId, initialId }: UsePhotoSta
             headers: { "Content-Type": file.type },
             body: file,
           });
-          if (!putRes.ok) continue;
+          if (!putRes.ok) {
+            throw new Error(`S3 upload failed (${putRes.status})`);
+          }
 
           newStaged.push({
             kind: "staged",
@@ -119,13 +141,19 @@ export function usePhotoStaging({ entityType, entityId, initialId }: UsePhotoSta
             url: publicUrl,
             key,
           });
-        } catch {
-          // skip failed uploads silently
+        } catch (err) {
+          failures += 1;
+          toast.error(err instanceof Error ? err.message : "Upload failed");
         }
       }
 
       if (newStaged.length > 0) {
         setPhotos((prev) => [...prev, ...newStaged]);
+        if (failures === 0) {
+          toast.success(
+            newStaged.length === 1 ? "Image uploaded" : `${newStaged.length} images uploaded`,
+          );
+        }
       }
       setUploading(false);
     },
