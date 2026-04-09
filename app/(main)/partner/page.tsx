@@ -11,8 +11,9 @@ export default async function PartnerPage() {
   const hero = page?.hero;
   const sections = getSections(page);
 
-  const textSections = sections.filter((s) => !s.items || s.items.length === 0);
-  const itemSections = sections.filter((s) => s.items && s.items.length > 0);
+  const ctaSection = sections.find((s) => s.id === "cta");
+  const textSections = sections.filter((s) => (!s.items || s.items.length === 0) && s.id !== "cta");
+  const itemSections = sections.filter((s) => s.items && s.items.length > 0 && s.id !== "cta");
 
   return (
     <>
@@ -102,13 +103,13 @@ export default async function PartnerPage() {
                 <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
                   <Mail className="h-7 w-7 text-primary" />
                 </div>
-                <h2 className="text-3xl font-extrabold sm:text-4xl">Interested in Partnering?</h2>
+                <h2 className="text-3xl font-extrabold sm:text-4xl">{ctaSection?.heading || "Interested in Partnering?"}</h2>
                 <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
-                  We&apos;d love to hear from you. Reach out and let&apos;s explore how we can work together.
+                  {ctaSection?.body || "We\u2019d love to hear from you. Reach out and let\u2019s explore how we can work together."}
                 </p>
                 <Button asChild size="lg" className="mt-10 rounded-full px-10 py-6 text-base gap-2 shadow-gold">
                   <Link href="/contact">
-                    Get in Touch <ArrowRight className="h-4 w-4" />
+                    {ctaSection?.items?.[0]?.title || "Get in Touch"} <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </div>

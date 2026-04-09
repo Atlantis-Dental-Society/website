@@ -10,8 +10,9 @@ export default async function JoinPage() {
   const hero = page?.hero;
   const sections = getSections(page);
 
-  const itemSections = sections.filter((s) => s.items && s.items.length > 0);
-  const textSections = sections.filter((s) => !s.items || s.items.length === 0);
+  const formSection = sections.find((s) => s.id === "form");
+  const itemSections = sections.filter((s) => s.items && s.items.length > 0 && s.id !== "form");
+  const textSections = sections.filter((s) => (!s.items || s.items.length === 0) && s.id !== "form");
 
   return (
     <>
@@ -96,7 +97,12 @@ export default async function JoinPage() {
       {/* Form */}
       <section className="pb-24">
         <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 mt-8">
-          <JoinForm />
+          <JoinForm
+            formHeading={formSection?.heading}
+            formDescription={formSection?.body}
+            successHeading={formSection?.items?.[0]?.title}
+            successMessage={formSection?.items?.[0]?.description}
+          />
         </div>
       </section>
     </>

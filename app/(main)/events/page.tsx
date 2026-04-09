@@ -21,6 +21,9 @@ export default async function EventsPage() {
   ]);
   const hero = page?.hero;
   const sections = getSections(page);
+  const upcomingSection = sections.find((s) => s.id === "upcoming");
+  const pastSection = sections.find((s) => s.id === "past");
+  const displaySections = sections.filter((s) => s.id !== "upcoming" && s.id !== "past");
 
   const upcoming = allEvents.filter((e) => e.date >= today);
   const past = allEvents.filter((e) => e.date < today);
@@ -59,7 +62,7 @@ export default async function EventsPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
               <CalendarDays className="h-5 w-5 text-primary" />
             </div>
-            <h2 className="text-2xl font-extrabold">Upcoming Events</h2>
+            <h2 className="text-2xl font-extrabold">{upcomingSection?.heading || "Upcoming Events"}</h2>
           </div>
 
           {upcoming.length === 0 ? (
@@ -68,7 +71,7 @@ export default async function EventsPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted shrink-0">
                   <Clock className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <p className="text-muted-foreground">No upcoming events at the moment. Check back soon!</p>
+                <p className="text-muted-foreground">{upcomingSection?.body || "No upcoming events at the moment. Check back soon!"}</p>
               </CardContent>
             </Card>
           ) : (
@@ -85,7 +88,7 @@ export default async function EventsPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-muted">
                   <CalendarDays className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <h2 className="text-2xl font-extrabold">Past Events</h2>
+                <h2 className="text-2xl font-extrabold">{pastSection?.heading || "Past Events"}</h2>
               </div>
               <div className="space-y-6">
                 {past.map((e) => (
@@ -98,7 +101,7 @@ export default async function EventsPage() {
       </section>
 
       {/* Dynamic sections from admin */}
-      {sections
+      {displaySections
         .filter((s) => s.items && s.items.length > 0)
         .map((section, idx) => {
           const items = (section.items ?? []).filter((i): i is NonNullable<typeof i> => !!i);
@@ -141,10 +144,10 @@ export default async function EventsPage() {
           );
         })}
 
-      {sections.filter((s) => !s.items || s.items.length === 0).length > 0 && (
+      {displaySections.filter((s) => !s.items || s.items.length === 0).length > 0 && (
         <section className="py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-            {sections
+            {displaySections
               .filter((s) => !s.items || s.items.length === 0)
               .map((section) => (
                 <Card key={section.id} className="rounded-2xl border-none ring-0 shadow-warm">

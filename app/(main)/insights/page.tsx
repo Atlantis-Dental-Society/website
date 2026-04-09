@@ -19,6 +19,8 @@ export default async function InsightsPage() {
   ]);
   const hero = page?.hero;
   const sections = getSections(page);
+  const emptySection = sections.find((s) => s.id === "empty");
+  const displaySections = sections.filter((s) => s.id !== "empty");
 
   const insightIds = allInsights.map((i) => i.id);
   const allPhotos = insightIds.length > 0
@@ -59,7 +61,7 @@ export default async function InsightsPage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 shrink-0">
                   <BookOpen className="h-6 w-6 text-primary" />
                 </div>
-                <p className="text-muted-foreground">No insights published yet. Check back soon!</p>
+                <p className="text-muted-foreground">{emptySection?.body || "No insights published yet. Check back soon!"}</p>
               </CardContent>
             </Card>
           ) : (
@@ -73,7 +75,7 @@ export default async function InsightsPage() {
       </section>
 
       {/* Dynamic sections from admin */}
-      {sections
+      {displaySections
         .filter((s) => s.items && s.items.length > 0)
         .map((section, idx) => {
           const items = (section.items ?? []).filter((i): i is NonNullable<typeof i> => !!i);
@@ -116,10 +118,10 @@ export default async function InsightsPage() {
           );
         })}
 
-      {sections.filter((s) => !s.items || s.items.length === 0).length > 0 && (
+      {displaySections.filter((s) => !s.items || s.items.length === 0).length > 0 && (
         <section className="py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-            {sections
+            {displaySections
               .filter((s) => !s.items || s.items.length === 0)
               .map((section) => (
                 <Card key={section.id} className="rounded-2xl border-none ring-0 shadow-warm">

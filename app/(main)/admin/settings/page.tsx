@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { siteConfigSchema, type SiteConfigInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
 import { toast } from "sonner";
@@ -26,6 +27,7 @@ export default function SettingsPage() {
     defaultValues: {
       name: initial?.name ?? "",
       tagline: initial?.tagline ?? "",
+      description: initial?.description ?? "",
       logo: initial?.logo ?? "",
       favicon: initial?.favicon ?? "",
       email: initial?.email ?? "",
@@ -62,6 +64,7 @@ export default function SettingsPage() {
       form.reset({
         name: initial.name ?? "",
         tagline: initial.tagline ?? "",
+        description: initial.description ?? "",
         logo: initial.logo ?? "",
         favicon: initial.favicon ?? "",
         email: initial.email ?? "",
@@ -109,6 +112,15 @@ export default function SettingsPage() {
                   <Field>
                     <FieldLabel htmlFor="cfg-tagline">Tagline</FieldLabel>
                     <Input id="cfg-tagline" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} placeholder="A short description of your site" />
+                  </Field>
+                )}
+              </form.Field>
+
+              <form.Field name="description">
+                {(f) => (
+                  <Field>
+                    <FieldLabel htmlFor="cfg-description">Description</FieldLabel>
+                    <Textarea id="cfg-description" value={f.state.value} onBlur={f.handleBlur} onChange={(e) => f.handleChange(e.target.value)} placeholder="A longer description shown in the footer" rows={2} />
                   </Field>
                 )}
               </form.Field>

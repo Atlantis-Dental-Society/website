@@ -9,7 +9,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
     <div className="flex min-h-svh flex-col">
       <Header logo={config?.logo ?? undefined} />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <Footer config={config} />
     </div>
   );
 }

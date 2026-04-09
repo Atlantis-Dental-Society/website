@@ -1,4 +1,4 @@
-import { getPageContent } from "@/lib/content";
+import { getPageContent, getSections } from "@/lib/content";
 import { BookOpen, FolderOpen } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { ComingSoon } from "@/components/coming-soon";
@@ -6,6 +6,8 @@ import { ComingSoon } from "@/components/coming-soon";
 export default async function ResourcesPage() {
   const page = await getPageContent("resources");
   const hero = page?.hero;
+  const sections = getSections(page);
+  const firstSection = sections[0];
 
   return (
     <>
@@ -31,8 +33,8 @@ export default async function ResourcesPage() {
                 <FolderOpen className="h-8 w-8 text-sage" />
               </div>
             }
-            title="Resources Coming Soon"
-            description="We are building out this section with helpful documents, guides, tools, and materials. Check back soon."
+            title={firstSection?.heading || "Resources Coming Soon"}
+            description={firstSection?.body || "We are building out this section with helpful documents, guides, tools, and materials. Check back soon."}
           />
         </div>
       </section>

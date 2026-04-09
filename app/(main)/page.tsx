@@ -88,8 +88,7 @@ export default async function HomePage() {
           return (
             <EventsTeaserSection
               key={id}
-              heading={section.heading}
-              body={section.body}
+              section={section}
               events={upcomingEvents}
             />
           );
@@ -241,14 +240,16 @@ function SplitFeatureSection({ section }: { section: SectionData }) {
 }
 
 function EventsTeaserSection({
-  heading,
-  body,
+  section,
   events: upcomingEvents,
 }: {
-  heading?: string | null;
-  body?: string | null;
+  section: SectionData;
   events: (typeof events.$inferSelect)[];
 }) {
+  const items = section.items ?? [];
+  const emptyText = items[0]?.description || "No upcoming events at the moment. Check back soon!";
+  const buttonText = items[0]?.title || "View All Events";
+
   return (
     <section className="relative py-24 sm:py-28 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/10 to-transparent" />
@@ -257,9 +258,9 @@ function EventsTeaserSection({
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
             <CalendarDays className="h-5 w-5 text-primary" />
           </div>
-          <h2 className="text-3xl font-extrabold sm:text-4xl">{heading}</h2>
+          <h2 className="text-3xl font-extrabold sm:text-4xl">{section.heading}</h2>
         </div>
-        <p className="text-muted-foreground leading-relaxed max-w-2xl mb-10">{body}</p>
+        <p className="text-muted-foreground leading-relaxed max-w-2xl mb-10">{section.body}</p>
 
         {upcomingEvents.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-3">
@@ -287,7 +288,7 @@ function EventsTeaserSection({
         ) : (
           <Card className="rounded-2xl border-none ring-0 shadow-warm">
             <CardContent className="p-8 text-center">
-              <p className="text-muted-foreground">No upcoming events at the moment. Check back soon!</p>
+              <p className="text-muted-foreground">{emptyText}</p>
             </CardContent>
           </Card>
         )}
@@ -295,7 +296,7 @@ function EventsTeaserSection({
         <div className="mt-8">
           <Button asChild variant="outline" className="rounded-full gap-2">
             <Link href="/events">
-              View All Events <ArrowRight className="h-4 w-4" />
+              {buttonText} <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>
@@ -305,6 +306,7 @@ function EventsTeaserSection({
 }
 
 function PartnerCTASection({ section }: { section: SectionData }) {
+  const buttonText = section.items?.[0]?.title || "Learn More";
   return (
     <section className="py-24 sm:py-28">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
@@ -325,7 +327,7 @@ function PartnerCTASection({ section }: { section: SectionData }) {
               <div className="mt-8 lg:mt-0 shrink-0">
                 <Button asChild size="lg" className="rounded-full px-10 py-6 text-base gap-2 shadow-gold">
                   <Link href="/partner">
-                    Learn More <ArrowRight className="h-4 w-4" />
+                    {buttonText} <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </div>
@@ -338,6 +340,7 @@ function PartnerCTASection({ section }: { section: SectionData }) {
 }
 
 function JoinCTASection({ section }: { section: SectionData }) {
+  const buttonText = section.items?.[0]?.title || "Join ADS";
   return (
     <section className="py-24 sm:py-28">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -350,7 +353,7 @@ function JoinCTASection({ section }: { section: SectionData }) {
               <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">{section.body}</p>
               <Button asChild size="lg" className="mt-10 rounded-full px-10 py-6 text-base gap-2 shadow-gold">
                 <Link href="/join">
-                  Join ADS <ArrowRight className="h-4 w-4" />
+                  {buttonText} <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>

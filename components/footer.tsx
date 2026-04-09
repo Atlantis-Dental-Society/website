@@ -2,8 +2,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart, Mail, Instagram } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import type { siteConfig as siteConfigTable } from "@/lib/schema";
 
-export function Footer() {
+type SiteConfig = typeof siteConfigTable.$inferSelect;
+
+export function Footer({ config }: { config?: SiteConfig | null }) {
+  const email = config?.email || "atlantisdentalsociety@gmail.com";
+  const instagramUrl = config?.instagramUrl || "https://instagram.com/atlantisdentalsociety";
+  const instagramHandle = config?.instagramHandle || "@atlantisdentalsociety";
+  const tagline = config?.tagline || "Everything pre-dental, all in one place.";
+  const description = config?.description || "A student-led organization at York University helping pre-dental students navigate their path to dental school.";
+
   return (
     <footer className="relative bg-muted/40">
       {/* Organic wave divider */}
@@ -17,9 +26,9 @@ export function Footer() {
               <Image src="/logo.png" alt="ADS" width={36} height={36} className="h-9 w-9" />
               <span className="text-lg font-bold text-foreground">ADS</span>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">Everything pre-dental, all in one place.</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{tagline}</p>
             <p className="mt-2 text-xs text-muted-foreground/70">
-              A student-led organization at York University helping pre-dental students navigate their path to dental school.
+              {description}
             </p>
           </div>
 
@@ -48,14 +57,14 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Mail className="h-3.5 w-3.5 text-primary" />
-                <a href="mailto:atlantisdentalsociety@gmail.com" className="hover:text-primary transition-colors">
-                  atlantisdentalsociety@gmail.com
+                <a href={`mailto:${email}`} className="hover:text-primary transition-colors">
+                  {email}
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Instagram className="h-3.5 w-3.5 text-primary" />
-                <a href="https://instagram.com/atlantisdentalsociety" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                  @atlantisdentalsociety
+                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                  {instagramHandle}
                 </a>
               </li>
             </ul>

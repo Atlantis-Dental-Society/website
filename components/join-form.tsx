@@ -18,7 +18,17 @@ import { toast } from "sonner";
 import { Send, CheckCircle } from "lucide-react";
 import { useState } from "react";
 
-export function JoinForm() {
+export function JoinForm({
+  formHeading,
+  formDescription,
+  successHeading,
+  successMessage,
+}: {
+  formHeading?: string | null;
+  formDescription?: string | null;
+  successHeading?: string | null;
+  successMessage?: string | null;
+}) {
   const [status, setStatus] = useState<"idle" | "success">("idle");
 
   const form = useForm({
@@ -62,9 +72,9 @@ export function JoinForm() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-sage/15 mx-auto">
             <CheckCircle className="h-8 w-8 text-sage" />
           </div>
-          <h2 className="mt-6 text-2xl font-bold">Application Submitted!</h2>
+          <h2 className="mt-6 text-2xl font-bold">{successHeading || "Application Submitted!"}</h2>
           <p className="mt-3 text-muted-foreground">
-            Thank you for your interest in Atlantis Dental Society. We&apos;ll be in touch soon.
+            {successMessage || "Thank you for your interest in Atlantis Dental Society. We\u2019ll be in touch soon."}
           </p>
         </CardContent>
       </Card>
@@ -74,8 +84,8 @@ export function JoinForm() {
   return (
     <Card className="rounded-3xl border-none ring-0 shadow-warm">
       <CardContent className="p-8 sm:p-10">
-        <h2 className="text-2xl font-extrabold">Application Form</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Fill out the form below and we&apos;ll get back to you.</p>
+        <h2 className="text-2xl font-extrabold">{formHeading || "Application Form"}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{formDescription || "Fill out the form below and we\u2019ll get back to you."}</p>
 
         <form
           className="mt-8 space-y-5"

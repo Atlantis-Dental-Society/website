@@ -55,6 +55,7 @@ export const siteConfig = pgTable("site_config", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   tagline: text("tagline"),
+  description: text("description"),
   logo: text("logo"),
   favicon: text("favicon"),
   email: text("email"),

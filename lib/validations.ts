@@ -48,6 +48,7 @@ export const joinSubmissionSchema = z.object({
 export const siteConfigSchema = z.object({
   name: z.string().min(1, "Site name is required"),
   tagline: optionalStr,
+  description: optionalStr,
   logo: optionalStr,
   favicon: optionalStr,
   email: z.string().email("Invalid email").optional().or(z.literal("")).transform((v) => (v === "" ? null : v)),

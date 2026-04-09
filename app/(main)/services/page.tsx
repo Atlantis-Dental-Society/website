@@ -1,4 +1,4 @@
-import { getPageContent } from "@/lib/content";
+import { getPageContent, getSections } from "@/lib/content";
 import { Clock } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { ComingSoon } from "@/components/coming-soon";
@@ -6,6 +6,8 @@ import { ComingSoon } from "@/components/coming-soon";
 export default async function ServicesPage() {
   const page = await getPageContent("services");
   const hero = page?.hero;
+  const sections = getSections(page);
+  const firstSection = sections[0];
 
   return (
     <>
@@ -31,8 +33,8 @@ export default async function ServicesPage() {
                 <Clock className="h-8 w-8 text-primary" />
               </div>
             }
-            title="Stay Tuned"
-            description="We are working on building services that will support pre-dental students. Check back for updates."
+            title={firstSection?.heading || "Stay Tuned"}
+            description={firstSection?.body || "We are working on building services that will support pre-dental students. Check back for updates."}
           />
         </div>
       </section>
