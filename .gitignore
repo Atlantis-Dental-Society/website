@@ -21,3 +21,4 @@ infra/node_modules/
 infra/package-lock.json
 tina/tina-lock.json
 tsconfig.tsbuildinfo
+.vercel
