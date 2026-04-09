@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { PageForm } from "@/components/admin/page-form";
 import { Loader2, FileText } from "lucide-react";
 import type { HeroData, SectionData } from "@/lib/schema";
 
@@ -18,8 +17,6 @@ interface PageData {
 export default function AdminPagesPage() {
   const [pages, setPages] = useState<PageData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<PageData | null>(null);
-  const [open, setOpen] = useState(false);
 
   const loadPages = useCallback(async () => {
     const res = await fetch("/api/admin/pages");
@@ -43,17 +40,13 @@ export default function AdminPagesPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {pages.map((page) => (
-            <button
-              key={page.slug}
-              className="text-left cursor-pointer"
-              onClick={() => { setEditing(page); setOpen(true); }}
-            >
+            <Link key={page.slug} href={`/admin/pages/${page.slug}`} className="cursor-pointer group">
               <Card className="h-full rounded-2xl border-none ring-0 shadow-warm hover:shadow-warm-lg transition-all hover:-translate-y-0.5">
                 <CardContent className="p-6">
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                     <FileText className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="font-bold text-lg capitalize">{page.slug}</h2>
+                  <h2 className="font-bold text-lg capitalize group-hover:text-primary transition-colors">{page.slug}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{page.title}</p>
                   {page.hero?.headline && (
                     <p className="mt-2 text-xs text-muted-foreground truncate">{page.hero.headline}</p>
@@ -63,21 +56,10 @@ export default function AdminPagesPage() {
                   </p>
                 </CardContent>
               </Card>
-            </button>
+            </Link>
           ))}
         </div>
       )}
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-5xl rounded-2xl">
-          {editing && (
-            <PageForm
-              initial={editing}
-              onDone={() => { setOpen(false); loadPages(); }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
