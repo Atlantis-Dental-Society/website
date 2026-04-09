@@ -27,6 +27,12 @@ interface InsightFormProps {
 
 export function InsightForm({ initial, onDone }: InsightFormProps) {
   const [insightId] = useState(() => initial?.id ?? crypto.randomUUID());
+  // Captures whether the user clicked "Save as Draft" (false) or "Publish"
+  // (true) for the current submit attempt. Using a ref instead of form state
+  // avoids a bug where form.setFieldValue("published", ...) didn't reliably
+  // propagate into the submit payload — the `published` field is never
+  // rendered as a <form.Field>, and the previous flow was racy.
+  const pendingPublishedRef = useRef<boolean>(true);
 
   const photoStaging = usePhotoStaging({
     entityType: "insights",
@@ -63,9 +69,12 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
       onSubmit: insightSchema,
     },
     onSubmit: async ({ value }) => {
+      const published = pendingPublishedRef.current;
       const url = initial ? `/api/insights/${initial.id}` : "/api/insights";
       const method = initial ? "PUT" : "POST";
-      const payload = initial ? value : { ...value, id: insightId };
+      const payload = initial
+        ? { ...value, published }
+        : { ...value, published, id: insightId };
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -91,7 +100,7 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
   });
 
   const submitWith = (published: boolean) => {
-    form.setFieldValue("published", published);
+    pendingPublishedRef.current = published;
     if (!form.state.values.slug) {
       form.setFieldValue("slug", slugify(form.state.values.title));
     }
@@ -99,7 +108,7 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); submitWith(form.state.values.published ?? true); }}>
+    <form onSubmit={(e) => { e.preventDefault(); submitWith(initial?.published ?? true); }}>
       <DialogHeader>
         <DialogTitle>{initial ? "Edit Insight" : "Add Insight"}</DialogTitle>
         <DialogDescription>

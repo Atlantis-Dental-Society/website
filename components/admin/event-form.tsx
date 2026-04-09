@@ -27,6 +27,12 @@ interface EventFormProps {
 
 export function EventForm({ initial, onDone }: EventFormProps) {
   const [eventId] = useState(() => initial?.id ?? crypto.randomUUID());
+  // Captures whether the user clicked "Save as Draft" (false) or "Publish"
+  // (true) for the current submit attempt. Using a ref instead of form state
+  // avoids a bug where form.setFieldValue("published", ...) didn't reliably
+  // propagate into the submit payload — the `published` field is never
+  // rendered as a <form.Field>, and the previous flow was racy.
+  const pendingPublishedRef = useRef<boolean>(true);
 
   const photoStaging = usePhotoStaging({
     entityType: "events",
@@ -66,9 +72,12 @@ export function EventForm({ initial, onDone }: EventFormProps) {
       onSubmit: eventSchema,
     },
     onSubmit: async ({ value }) => {
+      const published = pendingPublishedRef.current;
       const url = initial ? `/api/events/${initial.id}` : "/api/events";
       const method = initial ? "PUT" : "POST";
-      const payload = initial ? value : { ...value, id: eventId };
+      const payload = initial
+        ? { ...value, published }
+        : { ...value, published, id: eventId };
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -94,12 +103,12 @@ export function EventForm({ initial, onDone }: EventFormProps) {
   });
 
   const submitWith = (published: boolean) => {
-    form.setFieldValue("published", published);
+    pendingPublishedRef.current = published;
     form.handleSubmit();
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); submitWith(form.state.values.published ?? true); }}>
+    <form onSubmit={(e) => { e.preventDefault(); submitWith(initial?.published ?? true); }}>
       <DialogHeader>
         <DialogTitle>{initial ? "Edit Event" : "Add Event"}</DialogTitle>
         <DialogDescription>
