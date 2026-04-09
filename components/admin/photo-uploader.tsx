@@ -1,124 +1,40 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ImagePlus, X, GripVertical, Loader2 } from "lucide-react";
-
-export interface Photo {
-  id: string;
-  url: string;
-  key: string;
-  order: string | number;
-}
-
-async function extractError(res: Response, fallback: string): Promise<string> {
-  try {
-    const data = await res.json();
-    if (data?.error) return data.error;
-  } catch { /* not json */ }
-  return `${fallback} (${res.status})`;
-}
+import { photoKey, type StagedDisplayPhoto } from "@/lib/hooks/use-photo-staging";
 
 interface PhotoUploaderProps {
-  entityType: "events" | "insights";
-  entityId: string;
-  photos: Photo[];
-  onPhotosChange: (photos: Photo[]) => void;
+  photos: StagedDisplayPhoto[];
+  uploading: boolean;
+  onPickFiles: (files: FileList | File[]) => void;
+  onRemove: (photo: StagedDisplayPhoto) => void;
+  onReorder: (fromIndex: number, toIndex: number) => void;
 }
 
-export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: PhotoUploaderProps) {
-  const [uploading, setUploading] = useState(false);
+export function PhotoUploader({
+  photos,
+  uploading,
+  onPickFiles,
+  onRemove,
+  onReorder,
+}: PhotoUploaderProps) {
   const [dragOver, setDragOver] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const uploadFiles = useCallback(async (files: FileList | File[]) => {
-    const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
-    if (imageFiles.length === 0) return;
-
-    setUploading(true);
-    const newPhotos: Photo[] = [];
-    let failures = 0;
-
-    for (const file of imageFiles) {
-      try {
-        if (!file.type) {
-          throw new Error(`${file.name}: unknown file type`);
-        }
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            filename: file.name,
-            contentType: file.type,
-            entityType,
-            entityId,
-          }),
-        });
-
-        if (!res.ok) {
-          throw new Error(await extractError(res, "Failed to get upload URL"));
-        }
-        const { presignedUrl, publicUrl, key } = await res.json();
-
-        const s3Res = await fetch(presignedUrl, {
-          method: "PUT",
-          headers: { "Content-Type": file.type },
-          body: file,
-        });
-
-        if (!s3Res.ok) {
-          throw new Error(`S3 upload failed (${s3Res.status})`);
-        }
-
-        const photoRes = await fetch("/api/photos", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            entityType,
-            entityId,
-            url: publicUrl,
-            key,
-            order: String(photos.length + newPhotos.length),
-          }),
-        });
-
-        if (!photoRes.ok) {
-          throw new Error(await extractError(photoRes, "Failed to save photo"));
-        }
-
-        newPhotos.push(await photoRes.json());
-      } catch (err) {
-        failures++;
-        const msg = err instanceof Error ? err.message : "Upload failed";
-        toast.error(`${file.name}: ${msg}`);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragOver(false);
+      if (e.dataTransfer.files.length > 0) {
+        onPickFiles(e.dataTransfer.files);
       }
-    }
-
-    if (newPhotos.length > 0) {
-      onPhotosChange([...photos, ...newPhotos]);
-      if (failures === 0) {
-        toast.success(`Uploaded ${newPhotos.length} photo${newPhotos.length === 1 ? "" : "s"}`);
-      }
-    }
-    setUploading(false);
-  }, [entityType, entityId, photos, onPhotosChange]);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    if (e.dataTransfer.files.length > 0) {
-      uploadFiles(e.dataTransfer.files);
-    }
-  }, [uploadFiles]);
-
-  const handleDelete = async (photo: Photo) => {
-    await fetch(`/api/photos/${photo.id}`, { method: "DELETE" });
-    onPhotosChange(photos.filter((p) => p.id !== photo.id));
-  };
+    },
+    [onPickFiles],
+  );
 
   const handleDragStart = (idx: number) => {
     setDragIdx(idx);
@@ -127,11 +43,8 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
   const handleDragOverItem = (e: React.DragEvent, idx: number) => {
     e.preventDefault();
     if (dragIdx === null || dragIdx === idx) return;
-    const reordered = [...photos];
-    const [moved] = reordered.splice(dragIdx, 1);
-    reordered.splice(idx, 0, moved);
+    onReorder(dragIdx, idx);
     setDragIdx(idx);
-    onPhotosChange(reordered);
   };
 
   const handleDragEnd = () => {
@@ -144,16 +57,20 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
 
       {/* Drop zone */}
       <div
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
         className={`
           relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed
           p-6 cursor-pointer transition-all
-          ${dragOver
-            ? "border-primary bg-primary/5 scale-[1.01]"
-            : "border-muted-foreground/20 hover:border-primary/50 hover:bg-muted/30"
+          ${
+            dragOver
+              ? "border-primary bg-primary/5 scale-[1.01]"
+              : "border-muted-foreground/20 hover:border-primary/50 hover:bg-muted/30"
           }
           ${uploading ? "pointer-events-none opacity-60" : ""}
         `}
@@ -169,6 +86,9 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
             <span className="text-sm text-muted-foreground">
               Drag & drop images here, or click to browse
             </span>
+            <span className="text-xs text-muted-foreground/70">
+              Changes apply when you click Save or Publish
+            </span>
           </>
         )}
         <input
@@ -178,7 +98,7 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
           multiple
           className="hidden"
           onChange={(e) => {
-            if (e.target.files) uploadFiles(e.target.files);
+            if (e.target.files) onPickFiles(e.target.files);
             e.target.value = "";
           }}
         />
@@ -189,7 +109,7 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
         <div className="grid grid-cols-3 gap-3">
           {photos.map((photo, idx) => (
             <Card
-              key={photo.id}
+              key={photoKey(photo)}
               draggable
               onDragStart={() => handleDragStart(idx)}
               onDragOver={(e) => handleDragOverItem(e, idx)}
@@ -202,11 +122,7 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
             >
               <div className="aspect-square relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photo.url}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
+                <img src={photo.url} alt="" className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all" />
                 <div className="absolute top-1.5 left-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <GripVertical className="h-4 w-4 text-white drop-shadow" />
@@ -216,7 +132,10 @@ export function PhotoUploader({ entityType, entityId, photos, onPhotosChange }: 
                   variant="ghost"
                   size="icon-sm"
                   className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 hover:bg-red-500 text-white hover:text-white rounded-full h-6 w-6"
-                  onClick={(e) => { e.stopPropagation(); handleDelete(photo); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemove(photo);
+                  }}
                 >
                   <X className="h-3 w-3" />
                 </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "@tanstack/react-form";
 import { insightSchema, type InsightInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { slugify } from "@/lib/utils";
-import { PhotoUploader, type Photo } from "@/components/admin/photo-uploader";
+import { PhotoUploader } from "@/components/admin/photo-uploader";
+import { usePhotoStaging } from "@/lib/hooks/use-photo-staging";
 
 export type Insight = InsightInput & { id: string; createdAt: string; updatedAt: string };
 
@@ -25,17 +26,25 @@ interface InsightFormProps {
 }
 
 export function InsightForm({ initial, onDone }: InsightFormProps) {
-  const [photos, setPhotos] = useState<Photo[]>([]);
   const [insightId] = useState(() => initial?.id ?? crypto.randomUUID());
 
-  const loadPhotos = useCallback(async (id: string) => {
-    const res = await fetch(`/api/photos?entityType=insights&entityId=${id}`);
-    if (res.ok) setPhotos(await res.json());
-  }, []);
+  const photoStaging = usePhotoStaging({
+    entityType: "insights",
+    entityId: insightId,
+    initialId: initial?.id,
+  });
 
+  // Clean up staged S3 orphans on unmount (dialog closed without save, or
+  // after successful save where staged photos already became saved photos).
+  const cleanupRef = useRef<() => void>(() => {});
   useEffect(() => {
-    if (initial?.id) loadPhotos(initial.id);
-  }, [initial?.id, loadPhotos]);
+    cleanupRef.current = photoStaging.cleanupStaged;
+  }, [photoStaging.cleanupStaged]);
+  useEffect(() => {
+    return () => {
+      cleanupRef.current();
+    };
+  }, []);
 
   const form = useForm({
     defaultValues: {
@@ -66,6 +75,14 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
       if (!res.ok) {
         const d = await res.json();
         toast.error(d.error || "Failed to save");
+        return;
+      }
+
+      // Entity saved — now commit photo changes. Leave dialog open on
+      // partial failure so user can retry.
+      const result = await photoStaging.commit(insightId);
+      if (!result.ok) {
+        for (const err of result.errors) toast.error(err);
         return;
       }
 
@@ -183,10 +200,11 @@ export function InsightForm({ initial, onDone }: InsightFormProps) {
         </FieldGroup>
 
         <PhotoUploader
-          entityType="insights"
-          entityId={insightId}
-          photos={photos}
-          onPhotosChange={setPhotos}
+          photos={photoStaging.photos}
+          uploading={photoStaging.uploading}
+          onPickFiles={photoStaging.uploadFiles}
+          onRemove={photoStaging.remove}
+          onReorder={photoStaging.reorder}
         />
       </FieldGroup>
 

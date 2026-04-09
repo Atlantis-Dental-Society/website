@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "@tanstack/react-form";
 import { eventSchema, type EventInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { PhotoUploader, type Photo } from "@/components/admin/photo-uploader";
+import { PhotoUploader } from "@/components/admin/photo-uploader";
+import { usePhotoStaging } from "@/lib/hooks/use-photo-staging";
 
 export type Event = EventInput & { id: string; createdAt: string; updatedAt: string };
 
@@ -25,17 +26,28 @@ interface EventFormProps {
 }
 
 export function EventForm({ initial, onDone }: EventFormProps) {
-  const [photos, setPhotos] = useState<Photo[]>([]);
   const [eventId] = useState(() => initial?.id ?? crypto.randomUUID());
 
-  const loadPhotos = useCallback(async (id: string) => {
-    const res = await fetch(`/api/photos?entityType=events&entityId=${id}`);
-    if (res.ok) setPhotos(await res.json());
-  }, []);
+  const photoStaging = usePhotoStaging({
+    entityType: "events",
+    entityId: eventId,
+    initialId: initial?.id,
+  });
 
+  // On form unmount (dialog close without save, or after successful save)
+  // clean up any staged S3 objects that never got committed. After a
+  // successful commit, staged photos are transformed to saved — so this is
+  // a no-op in that case. The ref pattern keeps the latest cleanup fn
+  // available to the unmount effect without stale-closure bugs.
+  const cleanupRef = useRef<() => void>(() => {});
   useEffect(() => {
-    if (initial?.id) loadPhotos(initial.id);
-  }, [initial?.id, loadPhotos]);
+    cleanupRef.current = photoStaging.cleanupStaged;
+  }, [photoStaging.cleanupStaged]);
+  useEffect(() => {
+    return () => {
+      cleanupRef.current();
+    };
+  }, []);
 
   const form = useForm({
     defaultValues: {
@@ -66,6 +78,14 @@ export function EventForm({ initial, onDone }: EventFormProps) {
       if (!res.ok) {
         const data = await res.json();
         toast.error(data.error || "Failed to save");
+        return;
+      }
+
+      // Entity saved successfully — now commit photo changes. If photo commit
+      // partially fails we leave the dialog open so the user can retry.
+      const result = await photoStaging.commit(eventId);
+      if (!result.ok) {
+        for (const err of result.errors) toast.error(err);
         return;
       }
 
@@ -184,10 +204,11 @@ export function EventForm({ initial, onDone }: EventFormProps) {
         </form.Field>
 
         <PhotoUploader
-          entityType="events"
-          entityId={eventId}
-          photos={photos}
-          onPhotosChange={setPhotos}
+          photos={photoStaging.photos}
+          uploading={photoStaging.uploading}
+          onPickFiles={photoStaging.uploadFiles}
+          onRemove={photoStaging.remove}
+          onReorder={photoStaging.reorder}
         />
       </FieldGroup>
 
