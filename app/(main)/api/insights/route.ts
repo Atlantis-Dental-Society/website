@@ -8,9 +8,7 @@ import { requireAdmin } from "@/lib/require-admin";
 export async function GET() {
   try {
     const allInsights = await db.select().from(insights).orderBy(insights.publishedDate);
-    return NextResponse.json(allInsights, {
-      headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
-    });
+    return NextResponse.json(allInsights);
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
