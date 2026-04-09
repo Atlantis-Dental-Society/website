@@ -66,7 +66,7 @@ export default function SignupPage() {
           return;
         }
 
-        router.push("/admin");
+        router.push("/");
       } catch {
         toast.error("Something went wrong. Please try again.");
       } finally {
