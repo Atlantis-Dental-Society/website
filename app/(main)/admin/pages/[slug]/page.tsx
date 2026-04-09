@@ -160,7 +160,7 @@ export default function EditPagePage({ params }: { params: Promise<{ slug: strin
       <Accordion type="multiple" defaultValue={["info", "hero"]} className="space-y-4">
         {/* Page Info */}
         <AccordionItem value="info" className="border-none">
-          <Card className="rounded-2xl border-none ring-0 shadow-warm overflow-hidden">
+          <Card className="rounded-2xl border-none ring-0 shadow-warm">
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <span className="font-bold">Page Info</span>
             </AccordionTrigger>
@@ -183,7 +183,7 @@ export default function EditPagePage({ params }: { params: Promise<{ slug: strin
 
         {/* Hero Section */}
         <AccordionItem value="hero" className="border-none">
-          <Card className="rounded-2xl border-none ring-0 shadow-warm overflow-hidden">
+          <Card className="rounded-2xl border-none ring-0 shadow-warm">
             <AccordionTrigger className="px-6 py-4 hover:no-underline">
               <span className="font-bold">Hero Section</span>
             </AccordionTrigger>
@@ -232,7 +232,7 @@ export default function EditPagePage({ params }: { params: Promise<{ slug: strin
         {/* Sections */}
         {sections.map((section, si) => (
           <AccordionItem key={section._key} value={section._key} className="border-none">
-            <Card className="rounded-2xl border-none ring-0 shadow-warm overflow-hidden">
+            <Card className="rounded-2xl border-none ring-0 shadow-warm">
               <div className="flex items-center justify-between">
                 <AccordionTrigger className="flex-1 px-6 py-4 hover:no-underline">
                   <span className="font-bold">{section.heading || `Section ${si + 1}`}</span>

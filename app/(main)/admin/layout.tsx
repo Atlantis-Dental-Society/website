@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, FileText, FileStack, LayoutDashboard, LogOut, Menu, Palette, Settings, Users } from "lucide-react";
+import { CalendarDays, ChevronDown, FileText, FileStack, LayoutDashboard, LogOut, Menu, Palette, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -15,18 +15,40 @@ const navItems = [
   { label: "Events", href: "/admin/events", icon: CalendarDays },
   { label: "Insights", href: "/admin/insights", icon: FileText },
   { label: "Members", href: "/admin/members", icon: Users },
-  { label: "Pages", href: "/admin/pages", icon: FileStack },
   { label: "Settings", href: "/admin/settings", icon: Settings },
   { label: "Design System", href: "/design", icon: Palette },
 ];
+
+interface PageItem {
+  slug: string;
+  title: string;
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [pagesOpen, setPagesOpen] = useState(false);
+  const [pages, setPages] = useState<PageItem[]>([]);
+
+  const loadPages = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/pages");
+      if (res.ok) setPages(await res.json());
+    } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => { setSheetOpen(false); }, [pathname]);
+
+  useEffect(() => {
+    loadPages();
+  }, [loadPages]);
+
+  // Auto-expand pages section when on a pages route
+  useEffect(() => {
+    if (pathname.startsWith("/admin/pages")) setPagesOpen(true);
+  }, [pathname]);
 
   if (isPending) {
     return (
@@ -54,6 +76,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  const isOnPagesRoute = pathname.startsWith("/admin/pages");
+
   const sidebarContent = (
     <>
       <nav className="space-y-1 flex-1">
@@ -76,6 +100,55 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Button>
           );
         })}
+
+        {/* Pages collapsible */}
+        <div>
+          <Button
+            variant={isOnPagesRoute && !pathname.includes("/admin/pages/") ? "secondary" : "ghost"}
+            className={cn(
+              "w-full justify-start gap-2.5 rounded-lg",
+              isOnPagesRoute && !pathname.includes("/admin/pages/") && "bg-primary/10 text-primary hover:bg-primary/15"
+            )}
+            onClick={() => setPagesOpen((o) => !o)}
+          >
+            <FileStack className="h-4 w-4" />
+            Pages
+            <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", pagesOpen && "rotate-180")} />
+          </Button>
+          {pagesOpen && (
+            <div className="ml-4 mt-1 space-y-0.5 border-l border-border/40 pl-2">
+              <Button
+                asChild
+                variant={pathname === "/admin/pages" ? "secondary" : "ghost"}
+                size="sm"
+                className={cn(
+                  "w-full justify-start rounded-lg text-xs",
+                  pathname === "/admin/pages" && "bg-primary/10 text-primary hover:bg-primary/15"
+                )}
+              >
+                <Link href="/admin/pages">All Pages</Link>
+              </Button>
+              {pages.map((page) => {
+                const href = `/admin/pages/${page.slug}`;
+                const isActive = pathname === href;
+                return (
+                  <Button
+                    key={page.slug}
+                    asChild
+                    variant={isActive ? "secondary" : "ghost"}
+                    size="sm"
+                    className={cn(
+                      "w-full justify-start rounded-lg text-xs capitalize",
+                      isActive && "bg-primary/10 text-primary hover:bg-primary/15"
+                    )}
+                  >
+                    <Link href={href}>{page.slug}</Link>
+                  </Button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </nav>
       <Separator className="my-4 bg-border/30" />
       <div className="px-1">
