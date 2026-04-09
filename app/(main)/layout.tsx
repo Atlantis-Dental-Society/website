@@ -1,6 +1,6 @@
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { getSiteConfig } from "@/lib/tina";
+import { getSiteConfig } from "@/lib/content";
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const config = await getSiteConfig();

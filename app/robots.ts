@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/login", "/signup", "/forgot-password", "/reset-password", "/tina"],
+        disallow: ["/admin", "/login", "/signup", "/forgot-password", "/reset-password"],
       },
     ],
     sitemap: "https://atlantisdentalsociety.ca/sitemap.xml",

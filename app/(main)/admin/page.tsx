@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarDays, FileText, Settings, Users, Mail, BookOpen, Palette } from "lucide-react";
+import { CalendarDays, FileText, Settings, Users, Mail, BookOpen, Palette, FileStack } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const sections = [
@@ -20,11 +20,18 @@ const sections = [
     color: "bg-sage/10 text-sage",
   },
   {
-    label: "Content Editor",
-    description: "Edit pages, hero sections, and site config",
-    href: "/tina",
-    icon: Settings,
+    label: "Pages",
+    description: "Edit page content, heroes, and sections",
+    href: "/admin/pages",
+    icon: FileStack,
     color: "bg-terracotta/10 text-terracotta",
+  },
+  {
+    label: "Settings",
+    description: "Site name, logo, social links",
+    href: "/admin/settings",
+    icon: Settings,
+    color: "bg-gold/10 text-gold",
   },
   {
     label: "Members",

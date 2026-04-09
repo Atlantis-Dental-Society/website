@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean, date, index, integer } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, boolean, date, index, integer, jsonb } from "drizzle-orm/pg-core";
 
 export { user, session, account, verification, userRelations, sessionRelations, accountRelations } from "./auth-schema";
 
@@ -50,6 +50,51 @@ export const photos = pgTable("photos", {
 }, (table) => [
   index("photos_entity_idx").on(table.entityType, table.entityId),
 ]);
+
+export const siteConfig = pgTable("site_config", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  tagline: text("tagline"),
+  logo: text("logo"),
+  favicon: text("favicon"),
+  email: text("email"),
+  instagramUrl: text("instagram_url"),
+  instagramHandle: text("instagram_handle"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type HeroData = {
+  badge?: string | null;
+  headline?: string | null;
+  subheadline?: string | null;
+  ctaPrimary?: string | null;
+  ctaPrimaryLink?: string | null;
+  ctaSecondary?: string | null;
+  ctaSecondaryLink?: string | null;
+};
+
+export type SectionItem = {
+  title?: string | null;
+  description?: string | null;
+  icon?: string | null;
+};
+
+export type SectionData = {
+  id?: string | null;
+  heading?: string | null;
+  body?: string | null;
+  items?: SectionItem[];
+};
+
+export const pageContent = pgTable("page_content", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description"),
+  hero: jsonb("hero").$type<HeroData>(),
+  sections: jsonb("sections").$type<SectionData[]>().default([]),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 export const joinSubmissions = pgTable("join_submissions", {
   id: uuid("id").defaultRandom().primaryKey(),

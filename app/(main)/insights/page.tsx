@@ -1,4 +1,4 @@
-import { getPageContent } from "@/lib/tina";
+import { getPageContent } from "@/lib/content";
 import { db } from "@/lib/db";
 import { insights, photos } from "@/lib/schema";
 import { eq, and, inArray } from "drizzle-orm";

@@ -36,14 +36,6 @@ const nextConfig = {
       },
     ];
   },
-  async rewrites() {
-    return [
-      {
-        source: "/tina",
-        destination: "/tina-admin/index.html",
-      },
-    ];
-  },
 }
 
 export default nextConfig

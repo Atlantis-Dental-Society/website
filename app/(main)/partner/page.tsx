@@ -1,4 +1,4 @@
-import { getPageContent, getSections } from "@/lib/tina";
+import { getPageContent, getSections } from "@/lib/content";
 import { getIcon } from "@/lib/icons";
 import { Handshake, ArrowRight, Mail } from "lucide-react";
 import Link from "next/link";

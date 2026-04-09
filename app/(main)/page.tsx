@@ -12,7 +12,7 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
-import { getPageContent, getSections, type Section } from "@/lib/tina";
+import { getPageContent, getSections, type Section } from "@/lib/content";
 import { getIcon } from "@/lib/icons";
 import { db } from "@/lib/db";
 import { events } from "@/lib/schema";

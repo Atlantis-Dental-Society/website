@@ -1,4 +1,4 @@
-import { getPageContent } from "@/lib/tina";
+import { getPageContent } from "@/lib/content";
 import { Clock } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { ComingSoon } from "@/components/coming-soon";

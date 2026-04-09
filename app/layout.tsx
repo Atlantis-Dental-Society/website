@@ -4,7 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
-import { getSiteConfig } from "@/lib/tina";
+import { getSiteConfig } from "@/lib/content";
 
 const SITE_URL = "https://atlantisdentalsociety.ca";
 

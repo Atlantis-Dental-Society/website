@@ -1,4 +1,4 @@
-import { getPageContent, getSiteConfig } from "@/lib/tina";
+import { getPageContent, getSiteConfig } from "@/lib/content";
 import { Mail, Instagram } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHero } from "@/components/page-hero";

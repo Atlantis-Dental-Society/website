@@ -1,4 +1,4 @@
-import { getPageContent, getSections } from "@/lib/tina";
+import { getPageContent, getSections } from "@/lib/content";
 import { getIcon } from "@/lib/icons";
 import { Sparkles, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";

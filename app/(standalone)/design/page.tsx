@@ -78,7 +78,6 @@ const techStack = [
   { name: "Better Auth", role: "Authentication" },
   { name: "AWS S3 + CloudFront", role: "Media Storage & CDN" },
   { name: "AWS SES", role: "Email" },
-  { name: "TinaCMS", role: "Content Management" },
   { name: "Vercel", role: "Hosting & CI/CD" },
   { name: "Lucide Icons", role: "Iconography" },
   { name: "Sonner", role: "Toast Notifications" },
